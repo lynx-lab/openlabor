@@ -21,19 +21,19 @@ define('CLIENT1_DB_TYPE',  'mysql');
  *
  * @name CLIENT1_DB_NAME
  */
-define('CLIENT1_DB_NAME',  'ada_provider1');
+define('CLIENT1_DB_NAME',  'openlabor_provider1');
 
 /**
  *
  * @name CLIENT1_DB_USER
  */
-define('CLIENT1_DB_USER',  'user');
+define('CLIENT1_DB_USER',  'root');
 
 /**
  *
  * @name CLIENT1_DB_PASS
  */
-define('CLIENT1_DB_PASS',  'password');
+define('CLIENT1_DB_PASS',  '');
 
 /**
  *
