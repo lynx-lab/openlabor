@@ -400,7 +400,7 @@ class MultiPort
 		   * if it's an extraTable I need set_student to return me the id of the inserted
 		   * record in the table on DEFAULT that will be used as an id for all other providers
            */ 
-          $result = $tester_dh->set_student($user_id,$user_dataAr, $extraTableName, $userObj, &$idFromPublicTester);
+          $result = $tester_dh->set_student($user_id,$user_dataAr, $extraTableName, $userObj, $idFromPublicTester);
           break;
 
         case AMA_TYPE_AUTHOR:

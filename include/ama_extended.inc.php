@@ -53,7 +53,7 @@ class AMA_DataHandler extends AMA_Tester_DataHandler
 	 *
 	 * @see AMA_Tester_DataHandler::set_student()
 	 */
-	public function set_student($id_student ,$user_dataAr, $extraTableName = false, $userObj=null, $idFromPublicTester = null) {
+	public function set_student($id_student ,$user_dataAr, $extraTableName = false, $userObj=null, &$idFromPublicTester = null) {
 		$db =& $this->getConnection();
 		if ( AMA_DB::isError( $db ) ) return $db;
 
