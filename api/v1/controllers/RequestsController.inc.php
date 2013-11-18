@@ -36,6 +36,28 @@ class RequestsController extends openLaborController {
         echo $jobResult;
     }
 
+    /**
+     *  @abstract job report
+     *  @param array $request contains data of job report
+     *  @param string $format contains type of format (xml, json)
+     *  @param 
+     */
+    public function post002Action($dataAr,$format,$url_parameters) {
+//        print_r($request);
+        require_once(__DIR__ .'/../include/config.inc.php');
+//        echo "<br />Siamo nel posto giusto (getActionSearch): ";
+//        print_r($dataAr);
+//        $dataAr['professionalProfile'] = 'informatico';
+//        print_r(array('son qui',$professionalProfile));
+        $dataAr = $this->dataValidator($dataAr);
+        if ($dataAr['position'] != false && ($dataAr['positionCode'] == '' || $dataAr['positionCode'] == false))  {
+            $dataAr['positionCode'] = $this->getJobCode($dataAr['position']);
+        }
+//        print_r($jobResult['job_types']['categories'][0]['category']);
+        
+        echo $dataAr['positionCode'];
+    }
+    
     
     public function getActionSimple($request) {
         echo "<br />Siamo nel posto giusto: $request";
@@ -46,7 +68,8 @@ class RequestsController extends openLaborController {
     }
 
     public function postAction($request) {
-        echo "postAction<br />Siamo nel posto giusto";
+//        print_r($request);
+        echo "postAction<br />Siamo nel posto giusto ". $request;
         //print_r($request);
         $remoteJobs = new remoteXMLResource(URL_OL_PROV_ROMA,$labels,$elements);
         $cpiObj = new remoteXMLResource(URL_CPI,$cpiElements,$cpiElements);
@@ -61,6 +84,52 @@ class RequestsController extends openLaborController {
         return $jobOffer;
         //echo $jobOfferJson;
     }    
+    
+    /**
+     * @abstract return the code of position
+     * @param string $position
+     * @return string $positionCode
+     * 
+     */
+    public function getJobCode($position) {
+        $GLOBALS['dh'] = AMAOpenLaborDataHandler::instance(MultiPort::getDSN(DATA_PROVIDER));
+        $dh = $GLOBALS['dh'];
+        
+        $urlSemanticApi = URL_LAVORI4.$position;
+        $keywords = $position;
+        //$curlHeader = array("Content-Type: application/x-www-form-urlencoded");
+        $curlHeader = '';
+        $jobResult = REST_request::sendRequest($keywords,$curlHeader,$urlSemanticApi,$curlPost);
+        $jobResult = json_decode($jobResult,TRUE);
+        $positionCode = $jobResult['job_types']['categories'][0]['category'];        
+//        return $jobsCode['job_types']['categories'][0]['category'];
+        return $positionCode;
+    }
+    
+    /**
+     * 
+     * @abstract add job reported to table jobs
+     *           if positionCode is not a valid code it ask to semantic api to have the right code
+     *          
+     * @param array $dataAr
+     */
+    public function reportJob($dataAr=array()) {
+        $GLOBALS['dh'] = AMAOpenLaborDataHandler::instance(MultiPort::getDSN(DATA_PROVIDER));
+        $dh = $GLOBALS['dh'];
+        
+        if ($dataAr['positionCode'] == '') {
+            
+            $urlSemanticApi = URL_LAVORI4.$dataAr['professionalProfile'];
+            $keywords = $dataAr['professionalProfile'];
+            //$curlHeader = array("Content-Type: application/x-www-form-urlencoded");
+            $curlHeader = '';
+            $jobsCode = REST_request::sendRequest($keywords,$curlHeader,$urlSemanticApi,$curlPost);
+            //$resultAR = json_decode($jobsCode, TRUE);
+        }
+        return $jobsCode;
+
+        
+    }
     public function searchJobs($toSearch=array(),$keyMandatory=null) {
         $GLOBALS['dh'] = AMAOpenLaborDataHandler::instance(MultiPort::getDSN(DATA_PROVIDER));
         $dh = $GLOBALS['dh'];
@@ -149,6 +218,29 @@ class RequestsController extends openLaborController {
         }
         return $jobOffers;
     }
+    private function dataValidator($dataAr) {
+        $dataAr['api_key'] = DataValidator::validate_string($dataAr['api_key']);
+        $dataAr['professionalProfile'] = DataValidator::validate_string($dataAr['professionalProfile']);
+        $dataAr['position'] = DataValidator::validate_string($dataAr['position']);
+        $dataAr['positionCode'] = DataValidator::validate_string($dataAr['positionCode']);
+        $dataAr['qualificationRequired'] = DataValidator::validate_string($dataAr['qualificationRequired']);
+        $dataAr['professionalTrainingRequired'] = DataValidator::validate_string($dataAr['professionalTrainingRequired']);
+        $dataAr['workersRequired'] = DataValidator::is_uinteger($dataAr['workersRequired']);
+        $dataAr['jobExpiration'] = DataValidator::is_uinteger($dataAr['jobExpiration']);
+        $dataAr['descriptionQualificationRequired'] = DataValidator::validate_string($dataAr['descriptionQualificationRequired']);
+        $dataAr['professionalTrainingRequired'] = DataValidator::validate_string($dataAr['professionalTrainingRequired']);
+        $dataAr['cityCompany'] = DataValidator::validate_string($dataAr['cityCompany']);
+        $dataAr['experienceRequired'] = DataValidator::validate_string($dataAr['experienceRequired']);
+        $dataAr['durationExperience'] = DataValidator::is_uinteger($dataAr['durationExperience']);
+        $dataAr['minAge'] = DataValidator::is_uinteger($datAr['minAge']);
+        $dataAr['$maxAge'] = DataValidator::is_uinteger($datAr['$maxAge']);
+        $dataAr['remuneration'] = DataValidator::is_uinteger($datAr['remuneration']);
+        $dataAr['rewards'] = DataValidator::validate_string($dataAr['rewards']);
+        return $dataAr;
+
+    } 
+
+    
 }
 
 /*
@@ -159,5 +251,7 @@ class RequestsController extends openLaborController {
 //        print_r($remoteJobs->results);
  * 
  */
+
+
 
 ?>

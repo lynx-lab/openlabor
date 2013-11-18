@@ -119,9 +119,10 @@ class Request {
     public function parseIncomingParams() {
         $parameters = array();
 //        print_r($_SERVER);
-        // first of all, pull the GET varsa
+        // first of all, pull the GET var
 //        print_r($this->verb);
 //        print_r($this->url_elements[2]);
+//          print_r(array('type',$content_type,$_POST));
         $num_el = count($this->url_elements);
         if ($num_el>2) {
             $controller_name_tmp = explode('.',$this->url_elements[2]);
@@ -135,12 +136,13 @@ class Request {
             $format = $controller_name_tmp[($lenght-1)];
             unset($controller_name_tmp[($lenght-1)]);
             $this->url_elements[1] = implode('.',$controller_name_tmp);
-            
+
         }
         $this->format = $format;
+        
        switch ($this->verb) {
            case 'GET':
-//               print_r($_SERVER['QUERY_STRING']);
+               
                 if (isset($_SERVER['QUERY_STRING']) && $_SERVER['QUERY_STRING'] != '') {
                     parse_str($_SERVER['QUERY_STRING'], $parameters);
                 }
@@ -159,6 +161,45 @@ class Request {
                  */
                 break;
            case 'POST':
+                if(isset($_SERVER['CONTENT_TYPE'])) {
+                    $content_type = $_SERVER['CONTENT_TYPE'];
+                }
+                 $parameters = $this->_cleanInputs($_POST);
+//                print_r(array('type',$content_type,$_POST,$parameters) );
+                 break;
+                 /*
+                switch($content_type) {
+                    case "application/json":
+//                        print_r(array('type',$content_type,$_REQUEST) );
+                        $body_params = json_decode($_POST);
+                        if($body_params) {
+                            foreach($body_params as $param_name => $param_value) {
+                                $parameters[$param_name] = $param_value;
+                            }
+                        }
+                        $this->format = "json";
+                        break;
+                    case "application/x-www-form-urlencoded":
+                        $parameters = $this->_cleanInputs($_POST);
+                  * 
+                  */
+                        /*
+                        parse_str($_POST, $postvars);
+                        foreach($postvars as $field => $value) {
+                            $parameters[$field] = $value;
+                        }
+                         * 
+                         */
+                 /*
+                        $this->format = "html";
+                        break;
+                    default:
+                        // we could parse other supported formats here
+                        break;
+                }
+                break;
+                  * 
+                  */
            case 'PUT':
                 // now how about PUT/POST bodies? These override what we got from GET
                 $body = file_get_contents("php://input");
@@ -166,7 +207,6 @@ class Request {
                 if(isset($_SERVER['CONTENT_TYPE'])) {
                     $content_type = $_SERVER['CONTENT_TYPE'];
                 }
-        //        print_r(array('type',$content_type));
                 switch($content_type) {
                     case "application/json":
                         $body_params = json_decode($body);
@@ -178,7 +218,6 @@ class Request {
                         $this->format = "json";
                         break;
                     case "application/x-www-form-urlencoded":
-                        print_r($body);
                         parse_str($body, $postvars);
                         foreach($postvars as $field => $value) {
                             $parameters[$field] = $value;
@@ -196,4 +235,16 @@ class Request {
 //        print_r('parametri');
 //        print_r($this->parameters);
     }
+    
+    private function _cleanInputs($data) {
+        $clean_input = Array();
+        if (is_array($data)) {
+            foreach ($data as $k => $v) {
+                $clean_input[$k] = $this->_cleanInputs($v);
+            }
+        } else {
+            $clean_input = trim(strip_tags($data));
+        }
+        return $clean_input;
+    }    
 }    
