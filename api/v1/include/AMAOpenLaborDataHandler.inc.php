@@ -105,7 +105,9 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
             $JobData['linkMoreInfo'],
             time(),
             $JobData['source'],
-            $JobData['IdJobOriginal']    
+            $JobData['IdJobOriginal'],
+            $JobData['j_latitude'],
+            $JobData['j_longitude']    
 	);
         unset($JobData);
 
@@ -113,9 +115,9 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
         $update_sql = 'UPDATE OL_jobOffers SET idJobOriginal=?, jobExpiration=?, workersRequired=?, professionalProfile=?, positionCode=?, position=?,
                 qualificationRequired=?, descriptionQualificationRequired=?, professionalTrainingRequired=?, cityCompany=?,idCPI=?, experienceRequired=?,
                 durationExperience=?, minAge=?, maxAge=?, remuneration=?, rewards=?, reservedForDisabled=?, favoredCategoryRequests=?,
-                ownVehicle=?, notes=?, linkMoreInfo=?, dateInsert=?, sourceJob=? where idJobOriginal=?';
+                ownVehicle=?, notes=?, linkMoreInfo=?, dateInsert=?, sourceJob=?, j_latitude=?,j_longitude=? where idJobOriginal=?';
         
-        ADALogger::log_db("trying updateing the job offer: ".$update_sql);
+        ADALogger::log_db("trying updating the job offer: ".$update_sql);
         $res = $this->queryPrepared($update_sql, $data);
         
         // if an error is detected, an error is created and reported
@@ -127,6 +129,10 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
     }
 
 
+    /**
+     * @abstract add job offer to table
+     * @todo add a node each job
+     */
     public function addJobOffer($JobData) {
         $db =& $this->getConnection();
         if (self::isError($db)) return $db;
@@ -161,7 +167,10 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
             'notes'=>$this->sql_prepared($JobData['notes']),
             'linkMoreInfo'=>$this->sql_prepared($JobData['linkMoreInfo']),
             'dateInsert'=>time(),
-            'sourceJob'=>$this->sql_prepared($JobData['source'])
+            'sourceJob'=>$this->sql_prepared($JobData['source']),
+            'j_latitude'=>$this->sql_prepared($JobData['j_latitude']),
+            'linkMoreInfo'=>$this->sql_prepared($JobData['j_longitude']),
+                
 	);
         unset($JobData);
 

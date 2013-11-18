@@ -5,6 +5,15 @@
 	<attributes>
 		<attribute>
 			<variable>true</variable>
+			<code>api_key</code>
+			<datatype>string</datatype>
+			<required>true</required>
+			<datatype_description></datatype_description>		
+			<order>1</order>	
+			<description>api key</description>
+		</attribute>	
+		<attribute>
+			<variable>true</variable>
 			<code>jurisdiction_id </code>
 			<datatype>string</datatype>
 			<required>false</required>
