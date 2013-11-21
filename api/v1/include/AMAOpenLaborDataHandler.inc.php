@@ -77,8 +77,12 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
         if (!self::isError($CPIData) && is_array($CPIData)) {
             $idCPI = $CPIData[0]['idCPI'];
         }
-        print_r($jobData);
-        $jobexpiration = Abstract_AMA_DataHandler::date_to_ts($JobData['jobExpiration']); 
+        
+        if (!is_int($JobData['jobExpiration'])) {
+            $jobexpiration = Abstract_AMA_DataHandler::date_to_ts($JobData['jobExpiration']); 
+        } else {
+            $jobexpiration = $JobData['jobExpiration'];
+        }
         
         $data = array(
             $JobData['IdJobOriginal'],
@@ -87,10 +91,14 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
             $JobData['professionalProfile'],
             $JobData['positionCode'],
             $JobData['position'],
+            $JobData['contractType'],
             $JobData['qualificationRequired'],
             $JobData['descriptionQualificationRequired'],
             $JobData['professionalTrainingRequired'],
+            $JobData['address'],
+            $JobData['zipCode'],
             $JobData['cityCompany'],
+            $JobData['nation'],
             $idCPI,
             $JobData['experienceRequired'],
             $JobData['durationExperience'],
@@ -100,22 +108,28 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
             $JobData['rewards'],
             $JobData['reservedForDisabled'],
             $JobData['favoredCategoryRequests'],
-            $JobData['ownVehicle'],
+            $JobData['ownVehicle'],  
             $JobData['notes'],
             $JobData['linkMoreInfo'],
             time(),
             $JobData['source'],
             $JobData['IdJobOriginal'],
             $JobData['j_latitude'],
-            $JobData['j_longitude']    
+            $JobData['j_longitude'],
+            $JobData['media_url'],
+            $JobData['locale'],
+            $JobData['sourceJobName'],
+            $JobData['sourceJobSurname'],
+            $JobData['published']
+            
 	);
         unset($JobData);
 
         //fine validazione campi
         $update_sql = 'UPDATE OL_jobOffers SET idJobOriginal=?, jobExpiration=?, workersRequired=?, professionalProfile=?, positionCode=?, position=?,
-                qualificationRequired=?, descriptionQualificationRequired=?, professionalTrainingRequired=?, cityCompany=?,idCPI=?, experienceRequired=?,
-                durationExperience=?, minAge=?, maxAge=?, remuneration=?, rewards=?, reservedForDisabled=?, favoredCategoryRequests=?,
-                ownVehicle=?, notes=?, linkMoreInfo=?, dateInsert=?, sourceJob=?, j_latitude=?,j_longitude=? where idJobOriginal=?';
+                contractType=?, qualificationRequired=?, descriptionQualificationRequired=?, professionalTrainingRequired=?, address=?, zipCode=?, cityCompany=?,nation=?, 
+                idCPI=?, experienceRequired=?, durationExperience=?, minAge=?, maxAge=?, remuneration=?, rewards=?, reservedForDisabled=?, favoredCategoryRequests=?,
+                ownVehicle=?, notes=?, linkMoreInfo=?, dateInsert=?, sourceJob=?, j_latitude=?,j_longitude=?,media_url=?,locale=?,sourceJobName=?,sourceJobSurname=?,published=? where idJobOriginal=?';
         
         ADALogger::log_db("trying updating the job offer: ".$update_sql);
         $res = $this->queryPrepared($update_sql, $data);
@@ -137,12 +151,23 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
         $db =& $this->getConnection();
         if (self::isError($db)) return $db;
         if (!is_array($JobData)) return translateFN('dati non corretti');
-        $CPIData = $this->getCPIFromName($JobData['CPI']);
-        if (!self::isError($CPIData) && is_array($CPIData)) {
-            $idCPI = $CPIData[0]['idCPI'];
+        if ($JobData['CPI'] != NULL) {
+            $CPIData = $this->getCPIFromName($JobData['CPI']);
+            if (!self::isError($CPIData) && is_array($CPIData)) {
+                $idCPI = $CPIData[0]['idCPI'];
+            } else {
+                $idCPI = 0;
+            }
+        }
+        else {
+                $idCPI = 0;
         }
         
-        $jobexpiration = Abstract_AMA_DataHandler::date_to_ts($JobData['jobExpiration']); 
+        if (!is_int($JobData['jobExpiration'])) {
+            $jobexpiration = Abstract_AMA_DataHandler::date_to_ts($JobData['jobExpiration']); 
+        } else {
+            $jobexpiration = $JobData['jobExpiration'];
+        }
         $data = array(
             'IdJobOriginal'=>$this->or_zero($JobData['IdJobOriginal']),
             'jobExpiration'=>$this->or_zero($jobexpiration),
@@ -150,11 +175,15 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
             'professionalProfile'=>$this->sql_prepared($JobData['professionalProfile']),
             'positionCode'=>$this->sql_prepared($JobData['positionCode']),
             'position'=>$this->sql_prepared($JobData['position']),
+            'contractType'=>$this->sql_prepared($JobData['contractType']),
             'qualificationRequired'=>$this->sql_prepared($JobData['qualificationRequired']),
             'descriptionQualificationRequired'=>$this->sql_prepared($JobData['descriptionQualificationRequired']),
             'professionalTrainingRequired'=>$this->sql_prepared($JobData['professionalTrainingRequired']),
+            'address'=>$this->sql_prepared($JobData['address']),
+            'zipCode'=>$this->sql_prepared($JobData['zipCode']),
             'cityCompany'=>$this->sql_prepared($JobData['cityCompany']),
-            'idCPI'=>$this->or_null($idCPI),
+            'nation'=>$this->sql_prepared($JobData['nation']),
+            'idCPI'=>$this->or_zero($idCPI),
             'experienceRequired'=>$this->sql_prepared($JobData['experienceRequired']),
             'durationExperience'=>$this->sql_prepared($JobData['durationExperience']),
             'minAge'=>$this->sql_prepared($JobData['minAge']),
@@ -167,9 +196,14 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
             'notes'=>$this->sql_prepared($JobData['notes']),
             'linkMoreInfo'=>$this->sql_prepared($JobData['linkMoreInfo']),
             'dateInsert'=>time(),
-            'sourceJob'=>$this->sql_prepared($JobData['source']),
             'j_latitude'=>$this->sql_prepared($JobData['j_latitude']),
-            'linkMoreInfo'=>$this->sql_prepared($JobData['j_longitude']),
+            'j_longitude'=>$this->sql_prepared($JobData['j_longitude']),
+            'sourceJob'=>$this->sql_prepared($JobData['source']),
+            'media_url'=>$this->sql_prepared($JobData['media_url']),
+            'locale'=>$this->sql_prepared($JobData['locale']),
+            'sourceJobName'=>$this->sql_prepared($JobData['sourceJobName']),
+            'sourceJobSurname'=>$this->sql_prepared($JobData['sourceJobSurname']),
+            'published'=>$this->sql_prepared($JobData['published'])
                 
 	);
         unset($JobData);
