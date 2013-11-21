@@ -26,12 +26,15 @@
                         <i18n>home</i18n>
                     </a>
                 </li>
+                <li id="search">
+                    <a href="search.php"><i18n>cerca</i18n></a>
+                </li>
+<!--
                 <li id="com" class="unselectedcom" onClick="toggleElementVisibility('submenu_com','up')">
                     <a>
                         <i18n>comunica</i18n>
                     </a>
                 </li>
-                <!--
                 <li id="tools" class="unselectedtools" onClick="toggleElementVisibility('submenu_tools','up')">
                     <a>
                         <i18n>strumenti</i18n>
@@ -47,17 +50,22 @@
                         <i18n>Naviga</i18n>
                     </a>
                 </li>
-                -->
-                <li id="question_mark" class="unselectedquestion_mark" onClick="toggleElementVisibility('submenu_question_mark','up'); return false;">
-                    <a>
-                        <i18n>Help</i18n>
-                    </a>
-                </li>
-                <li id="esc">
+-->
+				<li id="tools" class="unselectedtools">
+				<a href="../../info.php">
+           			 <i18n>informazioni</i18n>
+			        </a>
+				</li>
+                 <li id="question_mark" class="unselectedquestion_mark">
+				<a href="../../help.php" target="_blank">
+					 <i18n>aiuto</i18n>
+				</a>
+				</li>
+                <!--li id="esc">
                     <a href="../../index.php">
                         <i18n>esci</i18n>
                     </a>
-                </li>
+                </li-->
             </ul>
             <!-- / menu -->
 
@@ -147,7 +155,7 @@
                 <div id="topcom_t">
                 </div>
                 <div id="com_toolscontent">
-                    <template_field class="microtemplate_field" name="com_tools">com_tools</template_field>
+                    <!--template_field class="microtemplate_field_disabled" name="com_tools">com_tools</template_field -->
                 </div>
                 <div id="bottomcom_t">
                 </div>
@@ -195,7 +203,7 @@
                     <div id="_comcontent">
                         <ul>
                             <li>
-                                <a href="#" onclick='openMessenger("../../comunica/list_messages.php",800,600);'>
+                                <a href="#" onclick='openMessenger("../comunica/list_messages.php",800,600);'>
                                     <i18n>messaggeria</i18n>
                                 </a>
                             </li>

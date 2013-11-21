@@ -497,3 +497,15 @@ padding: 1em;
 margin-left: 560px;
 
 }
+#submenu_com {
+    position: absolute;
+    top: 130px;
+    left: 135px;
+    padding: 0;
+}
+
+#search A {
+background: url(../img/timon.png) no-repeat center left;
+display: block;
+padding: 0 0 0 40px;
+}

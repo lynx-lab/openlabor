@@ -9,6 +9,8 @@
      */
 
      define('API_VERSION','v1');
+     define('OPENLABOR_API_KEY','LYNX_API_KEY');
+     
      /**
       * URL api 
       */
@@ -28,3 +30,8 @@
     define('TRAINING_COMMENT','007');
     define('TRAINING_VOTE','008');
     
+    /*
+     * LOG
+     */
+    define('LOGFILEREQUEST','log/openlaborRequest.txt');
+    define('LOGFILEREPORT','log/openlaborReport.txt');
