@@ -1,0 +1,173 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="powered_by" content="ADA v.0.1a">
+        <meta name="address" content="http://openlabor.lynxlab.com">
+        <meta name="author" content="">
+        <meta name="template" content="index.tpl">
+        <meta name="family" content="ada_blu">
+        <meta name="module" content="main">
+        <meta name="class" content="HTML">
+        <meta name="outputClasses" content="NEW">
+        <meta name="description" content="openlabor metadescription">
+        <meta name="keywords" content="ADA, Lynx, openlabor metakeywords,">
+        <meta name="cachefile" content="">
+        <link rel="stylesheet" href="http://openlabor.lynxlab.com/layout/ada_blu/css/main/default.css" type="text/css" media="screen">
+        <link rel="stylesheet" href="api.css" type="text/css" media="screen">
+        
+
+        <script type="text/javascript" src="http://openlabor.lynxlab.com/include/PHPjavascript.php"></script><script type="text/javascript" src="http://openlabor.lynxlab.com/external/lib/js/prototype-1.6.0.1.js"></script>
+<noscript>Questo browser non supporta Javascript</noscript>
+<script type="text/javascript" src="http://openlabor.lynxlab.com/external/lib/js/scriptaculous/scriptaculous.js"></script>
+<noscript>Questo browser non supporta Javascript</noscript>
+<script type="text/javascript" src="http://openlabor.lynxlab.com/js/main/default.js"></script>
+<noscript>Questo browser non supporta Javascript</noscript>
+<script type="text/javascript" src="http://openlabor.lynxlab.com/js/include/chkfrm.js"></script>
+<noscript>Questo browser non supporta Javascript</noscript>
+
+<title>OpenLabor API specification</title>
+
+</head>
+<body>
+
+<a name="top">
+</a>
+<!-- testata -->
+<div id="header">
+		 <div id="intestazione">
+    <div id="logo_title">
+        <img src="http://openlabor.lynxlab.com/layout/ada_blu/img/header-logo.png">
+       
+        <img src='http://www.citysdk.eu/wp-content/uploads/2012/04/CitySDK_logo_full_horizontal_trans_940.png' height='70px' border='0'>	
+         <img src='http://commonsforeurope.net/wp-content/uploads/2012/03/COM4EU_Logo.png' height='50px' border='0' > 
+    </div>
+</div>
+
+</div> 
+<!-- / testata -->
+<!-- contenitore -->
+<div id="container">
+<!-- contenuto -->
+<div id="content">
+<div id="topcont"></div>	 
+<div id="contentcontent">
+         <div class="first">
+            <div class="sx">
+                <div class="wellcome">
+                <div > </div>
+                <h1>
+                    <a name="general">OpenLabor API specification</a>
+                </h1>
+                
+                <h2  class="testh2">General</h2>
+The OpenLabor API is used by applications for sending job and training requests to Province of Rome (III Department). 
+At the moment, API is used for sending request about job, but the future plan is to use it on training as well.
+    Following functionalities are provided by the API:
+<ul>
+    <li>
+        Listing of service request types and definitions of the additional attributes
+    </li>    
+    <li>
+    Submitting service requests
+    </li>    
+    <li>
+    Quering individual or multiple service requests and their descriptions and status
+    </li>    
+</ul>
+    The issue reporting API is based on GeoReporting version 2, which is better known as <a href="http://open311.org/" target="_blank">Open311 specification</a>.  
+This interface is compliant with <a href="http://www.citysdk.eu/" target="_blank">CitySDK</a> specific enhancements to Open311
+<p>
+<div>
+    <h3>API Key</h3>
+    <div>
+Applications submitting jobs/training offers or submitting comments will need API key. All other methods do not require API key.         
+    </div>
+</div>
+
+<h3>Encoding and formats</h3>
+<p>UTF-8 is required everywhere. API supports both XML and JSON.</p>
+<h3>Language support</h3>
+The language specification is forseen (the locale variable accept the format: en_US, it_IT)
+<h2 class="testh2">
+<a name="methods">
+   API methods 
+</a>
+</p>    
+</h2>
+<p>OpenLabor provides RESTFul API methods according to <strong>international&#160;</strong><strong>standard&#160;</strong><strong><a href="http://open311.org/" target="_blank">Open311</a>:</strong></p>
+<ul>
+    <li>Check out the service (discovery):&#160;<a href="../doc_news/discovery.xml" target="_blank">XML</a>&#160;o&#160;<a href="../discovery.json" target="_blank">JSON</a></li>
+    <li>Check out the services (services):&#160;<a href="../doc_news/services.xml" target="_blank">XML</a>&#160;o&#160;<a href="../services.json" target="_blank">JSON</a></li>
+    <li>Check out the details of JOBS search service:&#160;<a href="../services/001.xml" target="_blank">XML</a>&#160;o&#160;<a href="../services/001.json" target="_blank">JSON</a></li>
+    <li>Check out the details of the reporting job service:&#160;<a href="../services/002.xml" target="_blank">XML</a>&#160;o&#160;<a href="../services/002.json" target="_blank">JSON</a></li>
+    <li>Check out the details of&#160;the training opportunities search service:&#160;<a href="../services/005.xml" target="_blank">XML</a>&#160;o&#160;<a href="../services/005.json" target="_blank">JSON</a></li>
+    <li>Check out the details of the reporting training opportinities service:&#160;<a href="../services/006.xml" target="_blank">XML</a>&#160;o&#160;<a href="../services/006.json" target="_blank">JSON</a></li>
+</ul>
+<p>&#160;</p>
+<p><a href="api/v1/services/006.json" target="_blank">&#160;</a></p>
+
+                </div>
+            </div>
+            <div class="dx">
+                <div class="index">
+                    <h3>index</h3>
+                    <ul>
+                        <li>
+                            <a href="#general">General</a>
+                        </li>
+                        <li>
+                            <a href="#methods">API methods</a>
+                        </li>
+                    </ul>
+                
+		</div>
+		  
+            </div>
+         </div>
+<br class="clearfix">
+</div>
+<div id="bottomcont"></div>
+</div> <!--  / contenuto -->
+</div> 
+<!-- / contenitore -->
+<!-- MENU A TENDINA -->
+<div id="mainmenu">
+<ul id="menu">
+		<!--li id="actions" class="unselectedactions">
+				<a href="browsing/registration.php">
+					 registrati
+				</a>
+		</li-->
+		<li id="home" class="home">
+				<a href="http://openlabor.lynxlab.com">
+           			 Home
+			        </a>
+	 </li>
+	   <li id="language_choose" class="language_choose">
+		|  <a href="#">English</a> | <a href="#">Italiano</a> </a> 
+	</li>
+	<br />
+	<li id="help_main" class="help_main">
+			<!--i18n>Explore the web site information or register and ask for a practitioner<i18n-->
+		 	 
+	</li>
+</ul> <!-- / menu -->
+</div> 
+<!-- / MENU A TENDINA -->
+<!-- PIEDE -->
+<div id="footer_login">
+		 <div style="float:left">
+	<a href="#top"><img src="http://openlabor.lynxlab.com/layout/ada_blu/img/up.png" border="0" alt="top"></a>
+</div>
+<div style="float:left">
+	<div class="copyright">Openlabor &egrave; un software opensource rilasciato sotto licenza GPL&nbsp;
+		Sviluppato con il contributo dei progetti CIP ICT/PSP <a href='http://commonsforeurope.net/' target='_blank'>Commons4EU</a>  - <a href='http://www.citysdk.eu/' target='_blank'>CitySDK</a><br />
+	</div> 
+</div>
+
+</div> <!-- / piede -->
+
+</body>
+</html>
