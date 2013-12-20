@@ -3075,13 +3075,15 @@ abstract class AMA_Tester_DataHandler extends Abstract_AMA_DataHandler {
                     $old_values_ha['codice_fiscale'],
                     AMA_Common_DataHandler::date_to_ts($old_values_ha['birthdate']),
                     $old_values_ha['sesso'],
-                    $old_values_ha['telefono'],
+                    $old_values_ha['stato'],
+                    $old_values_ha['lingua'],
+                    $old_values_ha['timezone'],
                     $id
             );
 
             $update_user_sql = 'UPDATE utente SET nome=?, cognome=?, e_mail=?, telefono=?, password=?, layout=?, '
                     . 'indirizzo=?, citta=?, provincia=?, nazione=?, codice_fiscale=?, birthdate=?, sesso=?, '
-                    . 'telefono=? WHERE id_utente=?';
+                    . 'stato=?, lingua=?, timezone=? WHERE id_utente=?';
 
             $result = $this->executeCriticalPrepared($update_user_sql, $valuesAr);
             // qui andrebbe differenziato il tipo di errore
@@ -9806,12 +9808,14 @@ abstract class AMA_Tester_DataHandler extends Abstract_AMA_DataHandler {
                     $old_values_ha['codice_fiscale'],
                     AMA_Common_DataHandler::date_to_ts($old_values_ha['birthdate']),
                     $old_values_ha['sesso'],
-                    $old_values_ha['telefono'],
+                    $old_values_ha['stato'],
+                    $old_values_ha['lingua'],
+                    $old_values_ha['timezone'],
                     $id
             );
             $update_user_sql = 'UPDATE utente SET nome=?, cognome=?, e_mail=?, telefono=?, password=?, layout=?, '
                     . 'indirizzo=?, citta=?, provincia=?, nazione=?, codice_fiscale=?, birthdate=?, sesso=?, '
-                    . 'telefono=? WHERE id_utente=?';
+                    . 'stato=?, lingua=?,timezone=? WHERE id_utente=?';
 
             $result = $this->executeCriticalPrepared($update_user_sql, $valuesAr);
             // qui andrebbe differenziato il tipo di errore
@@ -10344,7 +10348,7 @@ public function get_updates_nodes($userObj, $pointer)
                 $this->or_null($user_dataAr['telefono']),
                 $user_dataAr['stato'],
                 $user_dataAr['lingua'],
-                $user_dataAr['timezone']
+                $user_dataAr['timezone'],
         );
         /*
      * Adds the user
@@ -10754,7 +10758,7 @@ public function get_updates_nodes($userObj, $pointer)
         $db =& $this->getConnection();
         if (AMA_DB::isError($db)) return $db;
 
-        $sql = "SELECT U.tipo, U.username FROM utente AS U, iscrizioni AS I, tutor_studenti AS T
+        $sql = "SELECT U.tipo, U.username, U.name, U.cognome FROM utente AS U, iscrizioni AS I, tutor_studenti AS T
     		 WHERE I.id_utente_studente=$id_student AND T.id_istanza_corso = I.id_istanza_corso
     		 AND U.id_utente = T.id_utente_tutor";
         $result = $db->getAll($sql, NULL, AMA_FETCH_ASSOC);

@@ -58,9 +58,11 @@ class openLaborController {
    /*
     * Log the request
     */
-   public function LogRequest($request,$server,$NumResults) {
-//       $logRow = date("Y-m-d H:i:s");
-       $logFilename = LOGFILEREQUEST;
+   public function LogRequest($request,$server,$NumResults, $fileLog=NULL) {
+       $logRow = '**************';
+       if ($fileLog == NULL) {
+           $logFilename = LOGFILEREQUEST;
+       }
        $logRow .= $server['REQUEST_TIME'];
        $logRow .= '|'.$server['REMOTE_ADDR'];
        $logRow .= '|'.$server['REDIRECT_URL'];
@@ -75,9 +77,22 @@ class openLaborController {
           fwrite($fp, $logRow);
           fclose($fp);
        } 
-//       print_r($server);
-//       print_r($request);
-//       print_r($logRow);
+   }    
+       
+   /*
+    * Log the request
+    */
+   public function LogReport($request,$server,$text) {
+       $logRow = PHP_EOL.'**************';
+       $logFilename = 'log/openlaborReport.txt'; //LOGFILEREPORT;
+       $logRow .= $server['REQUEST_TIME'];
+       $logRow .= '|'.$text.PHP_EOL;
+
+       $fp = fopen($logFilename, "a+");
+       if ($fp){
+          fwrite($fp, $logRow);
+          fclose($fp);
+       } 
    }
 }
 ?>

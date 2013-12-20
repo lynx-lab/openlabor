@@ -1,0 +1,25 @@
+/* 
+    Document   : api
+    Created on : 20-nov-2013, 16.31.44
+    Author     : graffio
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+root { 
+    display: block;
+}
+
+.index {
+    weight: 80%;
+    border: 1px;
+    border-style: solid; 
+    padding: 5px;
+}
+
+.testh2 {
+    color: #9e0505;
+    border-bottom: 1px;
+    border-bottom-style: solid;
+    
+}

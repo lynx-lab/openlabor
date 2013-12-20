@@ -11,6 +11,7 @@ define('VERSION','v1');
 define('URL_LAVORI5','http://openlabor.lynxlab.com/services/search/lavori5/');
 define('URL_LAVORI4','http://openlabor.lynxlab.com/services/search/lavori4/');
 
+
 /*
  * Number of professional code to treat
  */

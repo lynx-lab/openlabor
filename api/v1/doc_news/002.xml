@@ -5,6 +5,15 @@
 	<attributes>
 		<attribute>
 			<variable>true</variable>
+			<code>api_key</code>
+			<datatype>string</datatype>
+			<required>true</required>
+			<datatype_description></datatype_description>		
+			<order>1</order>	
+			<description>api key</description>
+		</attribute>	
+		<attribute>
+			<variable>true</variable>
 			<code>jurisdiction_id </code>
 			<datatype>string</datatype>
 			<required>false</required>
@@ -34,7 +43,7 @@
 			<variable>true</variable>
 			<code>positionCode</code>
 			<datatype>singlevaluelist</datatype>
-			<required>true</required>
+			<required>false</required>
 			<datatype_description>National Professional Code according with international professional code (ISCO-08)</datatype_description>		
 			<order>1</order>	
 			<description>Professional profile</description>
@@ -51,6 +60,33 @@
 		</attribute>	
 		<attribute>
 			<variable>true</variable>
+			<code>contractType</code>
+			<datatype>string</datatype>
+			<required>true</required>
+			<datatype_description></datatype_description>		
+			<order>2</order>	
+			<description>Type of contract</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>workersRequired</code>
+			<datatype>int</datatype>
+			<required>true</required>
+			<datatype_description></datatype_description>		
+			<order>2</order>	
+			<description>Numbers of people the company wants to hire</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>jobExpiration</code>
+			<datatype>int</datatype>
+			<required>true</required>
+			<datatype_description></datatype_description>		
+			<order>2</order>	
+			<description>deadline (in unixtime) to submit the application </description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
 			<code>qualificationRequired</code>
 			<datatype>string</datatype>
 			<required>false</required>
@@ -58,7 +94,17 @@
 			<order>2</order>	
 			<description>educational qualification of the candidate</description>
 		</attribute>
-		<attribute>
+
+                <attribute>
+			<variable>true</variable>
+			<code>descriptionQualificationRequired</code>
+			<datatype>string</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>		
+			<order>2</order>	
+			<description>Description of competences of educational qualification of the candidate</description>
+		</attribute>
+                <attribute>
 			<variable>true</variable>
 			<code>professionalTrainingRequired</code>
 			<datatype>string</datatype>
@@ -71,32 +117,142 @@
 			<variable>true</variable>
 			<code>address</code>
 			<datatype>string</datatype>
-			<required>true</required>
+			<required>false</required>
 			<datatype_description></datatype_description>		
 			<order>2</order>	
 			<description>Human entered address or location</description>
 		</attribute>
 		<attribute>
 			<variable>true</variable>
-			<code>address</code>
+			<code>zipCode</code>
 			<datatype>string</datatype>
-			<required>true</required>
+			<required>false</required>
 			<datatype_description></datatype_description>		
 			<order>2</order>	
-			<description>Human entered address or location</description>
+			<description>Human entered zip code (CAP in Italy)</description>
 		</attribute>
 		<attribute>
 			<variable>true</variable>
-			<code>city</code>
+			<code>cityCompany</code>
 			<datatype>string</datatype>
-			<required>true</required>
+			<required>false</required>
 			<datatype_description></datatype_description>
 			<order>2</order>
-			<description>City in which looking for job</description>
+			<description>City in which is based the company hiring </description>
 		</attribute>
 		<attribute>
 			<variable>true</variable>
-			<code>lat</code>
+			<code>nation</code>
+			<datatype>string</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>The nation in which is based the company hiring </description>
+		</attribute>
+
+		<attribute>
+			<variable>true</variable>
+			<code>experienceRequired</code>
+			<datatype>string</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>Experience required by the company </description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>durationExperience</code>
+			<datatype>int</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>how many year of experience the company requires</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>minAge</code>
+			<datatype>int</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>minimum age required</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>maxAge</code>
+			<datatype>int</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>maximum age required</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>remuneration</code>
+			<datatype>int</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>remuneration offered by the company</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>rewards</code>
+			<datatype>string</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>rewards offered by the company</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>reservedForDisabled</code>
+			<datatype>booloean</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>whether the job is reserved to disable people</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>favoredCategoryRequests</code>
+			<datatype>string</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>to which kind of disabilities are reserved job (only if reserved for disabled is true)</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>ownVehicle</code>
+			<datatype>boolean</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>whether the hiring candidate has to have a own vehicle </description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>notes</code>
+			<datatype>string</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>notes</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>linkMoreInfo</code>
+			<datatype>string</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>URL to more info about job offer</description>
+		</attribute>
+                                
+		<attribute>
+			<variable>true</variable>
+			<code>j_latitude</code>
 			<datatype>string</datatype>
 			<required>false</required>
 			<datatype_description></datatype_description>		
@@ -105,8 +261,8 @@
 		</attribute>
 		<attribute>
 			<variable>true</variable>
-			<code>long</code>
-			<datatype>string</datatype>multiple attribute
+			<code>j_longitude</code>
+			<datatype>string</datatype>
 			<required>false</required>
 			<datatype_description></datatype_description>
 			<order>2</order>
@@ -114,12 +270,30 @@
 		</attribute>
 		<attribute>
 			<variable>true</variable>
-			<code>source_job</code>
+			<code>sourceJob</code>
 			<datatype>string</datatype>
 			<required>true</required>
 			<datatype_description></datatype_description>
 			<order>2</order>
-			<description>email address of the person or his/her id</description>
+			<description>email address of the person who report the job offer or his/her id</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>sourceJobName</code>
+			<datatype>string</datatype>
+			<required>true</required>
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>first name of the person who report the job offer or his/her id</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>sourceJobSurname</code>
+			<datatype>string</datatype>
+			<required>true</required>
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>last name of the person who report the job offer or his/her id</description>
 		</attribute>
 		<attribute>
 			<variable>true</variable>
@@ -129,6 +303,15 @@
 			<datatype_description></datatype_description>
 			<order>2</order>
 			<description>URL to media</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>published</code>
+			<datatype>boolean</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>whether job offer is published</description>
 		</attribute>
 	</attributes>
 </service_definition>

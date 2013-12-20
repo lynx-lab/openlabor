@@ -21,7 +21,7 @@ class REST_request {
         $res = curl_exec ($ch) ;
         curl_close ($ch) ;
 //        print_r($res);
-        return ($res) ;       
+        return $res ;       
        
     }
 }
