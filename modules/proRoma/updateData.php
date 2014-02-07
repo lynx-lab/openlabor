@@ -19,6 +19,12 @@ require_once (CORE_LIBRARY_PATH .'/includes.inc.php');
  */
 $allowedUsersAr = array(AMA_TYPE_VISITOR, AMA_TYPE_SWITCHER, AMA_TYPE_ADMIN);
 
+/*
+ * specific API inclusion version 1
+ * 
+ */
+//require_once (ROOT_DIR . '/api/v1/include/config.inc.php');
+
 /**
  * Get needed objects
  */

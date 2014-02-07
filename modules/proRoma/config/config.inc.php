@@ -37,9 +37,28 @@ define('URL_CPI','include/CentriPerImpiego.xml');
 $cpiElements = array ('idCentro','Denominazione','Indirizzo','Cap','Comune','BacinoDiCompetenza','Telefono','Fax','eMail','Latitudine','Longitudine');
 
 /*
- * PROVIDER IN WHICH IMPORT DATA
+ * PROVIDER IN WHICH SEARCH DATA
  */
 define('DATA_PROVIDER','client0');
+
+/* 
+ * ADA SERVICE ID RELATED TO JOB OFFER DATA
+ * Va creato il servizio nel provider definito in DATA_PROVIDER
+ * (login come switcher, add service)
+ */
+define('ADA_JOB_SERVICE_ID','1');
+
+/*
+ * ADA INSTANCE SERVICE ID RELATED TO JOB OFFER DATA
+ * Va creata l'instanza del servizio indicato in ADA_JOB_SERVICE_ID provider definito in DATA_PROVIDER
+ * (login come switcher, add service)
+ */
+define('ADA_JOB_INSTANCE_SERVICE_ID','6');
+
+/*
+ * ADA SERVICE ID RELATED TO TRAINING OFFER DATA
+ */
+define('ADA_TRAINING_SERVICE_ID','client0');
 
 /*
  * utility for educational qualification
