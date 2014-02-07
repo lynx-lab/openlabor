@@ -42,9 +42,11 @@ require_once ROOT_DIR.'/include/data_validation.inc.php';
  */
 require_once('./include/config.inc.php');
 require_once('./controllers/OpenLaborController.inc.php');
+require_once('./controllers/errorController.inc.php');
 require_once(__DIR__ . '/include/extract_class.inc.php');
 require_once('./include/restRequest.inc.php');
 require_once('include/AMAOpenLaborDataHandler.inc.php');
+
 
 
 
@@ -93,7 +95,19 @@ if (class_exists($controller_name)) {
     else {
         $action_name = strtolower($verb) .'Action';
     }
-    $controller->$action_name($requestObj->parameters,$requestObj->format,$url_elements);
+    if (method_exists($controller, $action_name)) {
+        $controller->$action_name($requestObj->parameters,$requestObj->format,$url_elements);
+    }
+    else {
+        $controller = new errorController();
+        $errorMsg = 'method required does not exist';
+        $controller->printError($verb,$requestObj->format,$errorMsg,$requestObj->parameters,$url_elements);        
+    }
+} else {
+    $controller = new errorController();
+//    $errorMsg = translateFN('URL malformed');
+    $errorMsg = 'URL malformed';
+    $controller->printError($verb,$requestObj->format,$errorMsg,$requestObj->parameters,$url_elements);
 }
 
 class Request {

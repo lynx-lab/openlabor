@@ -74,8 +74,10 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
         if (self::isError($db)) return $db;
         if (!is_array($JobData)) return translateFN('dati non corretti');
         $CPIData = $this->getCPIFromName($JobData['CPI']);
-        if (!self::isError($CPIData) && is_array($CPIData)) {
+        if (!self::isError($CPIData) && is_array($CPIData) && $CPIData[0]['idCPI'] != null) {
             $idCPI = $CPIData[0]['idCPI'];
+        }else {
+            $idCPI = 0;
         }
         
         if (!is_int($JobData['jobExpiration'])) {
@@ -83,7 +85,7 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
         } else {
             $jobexpiration = $JobData['jobExpiration'];
         }
-        
+        $data = array();
         $data = array(
             $JobData['IdJobOriginal'],
             $jobexpiration,
@@ -113,23 +115,38 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
             $JobData['linkMoreInfo'],
             time(),
             $JobData['source'],
-            $JobData['IdJobOriginal'],
             $JobData['j_latitude'],
             $JobData['j_longitude'],
             $JobData['media_url'],
             $JobData['locale'],
             $JobData['sourceJobName'],
             $JobData['sourceJobSurname'],
-            $JobData['published']
+            $JobData['published'],
+            $JobData['j_idNode']
             
 	);
-        unset($JobData);
+        
+        /*
+         * needed to allow update from module proRoma.
+         * priority to idJobOriginal
+         */
+        $clause = 'idJobOriginal=?';
+        if (isset($JobData['idJobOriginal']) && $JobData['idJobOriginal'] != 0) {
+            $data[] = $JobData['idJobOriginal'];
+            $clause = 'idJobOriginal=?';
+        }
+        elseif (isset($JobData['idJobOffers']) && $JobData['idJobOffers'] != 0) {
+            $data[] = $JobData['idJobOffers'];
+            $clause = 'idJobOffers=?';
+        }
+//        unset($JobData);
 
         //fine validazione campi
         $update_sql = 'UPDATE OL_jobOffers SET idJobOriginal=?, jobExpiration=?, workersRequired=?, professionalProfile=?, positionCode=?, position=?,
-                contractType=?, qualificationRequired=?, descriptionQualificationRequired=?, professionalTrainingRequired=?, address=?, zipCode=?, cityCompany=?,nation=?, 
+                contractType=?, qualificationRequired=?, descriptionQualificationRequired=?, professionalTrainingRequired=?, j_address=?, zipCode=?, cityCompany=?,nation=?, 
                 idCPI=?, experienceRequired=?, durationExperience=?, minAge=?, maxAge=?, remuneration=?, rewards=?, reservedForDisabled=?, favoredCategoryRequests=?,
-                ownVehicle=?, notes=?, linkMoreInfo=?, dateInsert=?, sourceJob=?, j_latitude=?,j_longitude=?,media_url=?,locale=?,sourceJobName=?,sourceJobSurname=?,published=? where idJobOriginal=?';
+                ownVehicle=?, notes=?, linkMoreInfo=?, dateInsert=?, sourceJob=?, j_latitude=?,j_longitude=?,media_url=?,locale=?,sourceJobName=?,sourceJobSurname=?,
+                published=?,j_idNode=? where '.$clause; // idJobOriginal=?';
         
         ADALogger::log_db("trying updating the job offer: ".$update_sql);
         $res = $this->queryPrepared($update_sql, $data);
@@ -168,6 +185,7 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
         } else {
             $jobexpiration = $JobData['jobExpiration'];
         }
+        $JobData['j_idNode'] = '0';
         $data = array(
             'IdJobOriginal'=>$this->or_zero($JobData['IdJobOriginal']),
             'jobExpiration'=>$this->or_zero($jobexpiration),
@@ -179,7 +197,7 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
             'qualificationRequired'=>$this->sql_prepared($JobData['qualificationRequired']),
             'descriptionQualificationRequired'=>$this->sql_prepared($JobData['descriptionQualificationRequired']),
             'professionalTrainingRequired'=>$this->sql_prepared($JobData['professionalTrainingRequired']),
-            'address'=>$this->sql_prepared($JobData['address']),
+            'j_address'=>$this->sql_prepared($JobData['address']),
             'zipCode'=>$this->sql_prepared($JobData['zipCode']),
             'cityCompany'=>$this->sql_prepared($JobData['cityCompany']),
             'nation'=>$this->sql_prepared($JobData['nation']),
@@ -203,10 +221,10 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
             'locale'=>$this->sql_prepared($JobData['locale']),
             'sourceJobName'=>$this->sql_prepared($JobData['sourceJobName']),
             'sourceJobSurname'=>$this->sql_prepared($JobData['sourceJobSurname']),
-            'published'=>$this->sql_prepared($JobData['published'])
+            'published'=>$this->sql_prepared($JobData['published']),
+            'j_idNode'=>$this->sql_prepared($JobData['j_idNode'])
                 
 	);
-        unset($JobData);
 
         //fine validazione campi
         $keys = array_keys($data);
@@ -219,10 +237,177 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
         if (self::isError($res)) {
             return new AMA_Error($this->errorMessage(AMA_ERR_ADD)." while in addJobOffer.".AMA_SEP.": ".$res->getMessage());
         }
-        return $db->lastInsertID();
+        $jobId = $db->lastInsertID();
+        $idNodeJob = $this->addNodeJob($JobData);
+        if (!self::isError($idNodeJob) && $idNodeJob != null) {
+            $JobData['j_idNode'] = $idNodeJob;
+            $JobData['idJobOffers'] = $jobId;            
+            $this->updateJob($JobData);
+        }
+        unset($JobData);
+        
+        return $jobId;
     }
         
+ 
+    /**
+     * @author graffio  <graffio@lynxlab.com
+     * @param Array $dataAr Job Offer data
+     * @param Int $jobId the Id of job offer inserted
+     * @param INT $serviceId the Id of service to wh
+     * @return string $insertedNodeId the Id of node related o job offer to whom the node is child
+     */
+    public function addNodeJob($dataAr, $serviceId = null, $instanceId = null) {
+        if ($serviceId == null) {
+            $node_ha['id_course'] = ADA_JOB_SERVICE_ID;
+            $node_ha['parent_id'] = ADA_JOB_SERVICE_ID.'_0';            
+        } else {
+            $node_ha['id_course'] = $serviceId;
+            $node_ha['parent_id'] = $serviceId.'_0';
+        }
         
+        if ($instanceId == null) {
+            $node_ha['id_instance'] = ADA_JOB_INSTANCE_SERVICE_ID;
+        } else {
+            $node_ha['id_instance'] = $instanceId;
+        }
+        
+        $node_ha['id_node_author'] = 1; // assuming ADMIN of platform
+        if (is_int($dataAr['sourceJob']) && $dataAr['sourceJob'] > 0) {
+            $node_ha['id_node_author'] = $dataAr['sourceJob'];
+        } elseif (DataValidator::validate_email ($dataAr['sourceJob'])) {
+            $id_node_author = $dh->find_user_from_username($dataAr['sourceJob']);
+            if (!AMA_DB::isError($id_node_author)) $node_ha['id_node_author'] = $id_node_author;
+        }
+        
+
+        $node_ha['name'] = $dataAr['positionCode'];
+        $node_ha['title'] = $dataAr['position'];
+        $node_ha['text'] = $dataAr['professionalProfile'].PHP_EOL.$dataAr['notes'].PHP_EOL.$dataAr['professionalProfile'];
+        $node_ha['type'] = ADA_LEAF_TYPE;
+        $node_ha['creation_date'] = $this->date_to_ts(time());
+
+        $node_ha['order'] = $node_ha['order'];
+        $node_ha['level'] = '0';
+        $node_ha['vesion'] = '0';
+        $node_ha['n_contacts'] = 0;
+        $node_ha['icon'] = '';
+
+        $node_ha['bgcolor'] = '';
+        $node_ha['color'] = '';
+        $node_ha['correctness'] = '';
+        $node_ha['copyright'] = '0';
+        $node_ha['id_position'] = '';
+        $node_ha['lingua'] = $dataAr['locale'];
+        $node_ha['pubblicato'] = $dataAr['published'];
+
+        $idNode = $this->add_node($node_ha);
+        return $idNode;
+        
+    }
+    
+    /**
+     * Add a node
+     * only add a node. Leaves out position, author and course.
+     * This function is called from the public add_node function.
+     *
+     * @access private
+     *
+     * @param $node_ha an associative array containing all the node's data (see public function)
+     *
+     * @return an AMA_Error object if something goes wrong,
+     *         true on success
+     *
+     * @see add_node()
+     */
+    public function add_node($node_ha) {
+        
+        ADALogger::log_db("entered _add_node");
+
+        $db =& $this->getConnection();
+        if ( AMA_DB::isError( $db ) ) return $db;
+
+        // FIXME: l'id del nodo dovrebbe venire ottenuto qui e non passato nell'array $node_ha
+        // Fixed by Graffio 08/11/2011
+        //$id_node = $this->sql_prepared($node_ha['id']);
+        $id_author = $node_ha['id_node_author'];
+        $name = $this->sql_prepared($this->or_null($node_ha['name']));
+        $title = $this->sql_prepared($this->or_null($node_ha['title']));
+
+        $text = $this->sql_prepared($node_ha['text']);
+        $type = $this->sql_prepared($this->or_zero($node_ha['type']));
+        $creation_date = $this->date_to_ts($this->or_null($node_ha['creation_date']));
+        $parent_id = $this->sql_prepared($node_ha['parent_id']);
+        $order = $this->sql_prepared($this->or_null($node_ha['order']));
+        $level = $this->sql_prepared($this->or_zero($node_ha['level']));
+        $version = $this->sql_prepared($this->or_zero($node_ha['version']));
+        $n_contacts = $this->sql_prepared($this->or_zero($node_ha['n_contacts']));
+        $icon = $this->sql_prepared($this->or_null($node_ha['icon']));
+
+        $bgcolor = $this->sql_prepared($this->or_null($node_ha['bgcolor']));
+        $color = $this->sql_prepared($this->or_null($node_ha['color']));
+        $correctness = $this->sql_prepared($this->or_zero($node_ha['correctness']));
+        $copyright = $this->sql_prepared($this->or_zero($node_ha['copyright']));
+        $id_position = $this->sql_prepared($node_ha['id_position']);
+        $lingua = $this->sql_prepared($node_ha['lingua']);
+        $pubblicato = $this->sql_prepared($node_ha['pubblicato']);
+
+        if (array_key_exists('id_instance',$node_ha)) {
+            $id_instance = $this->sql_prepared($this->or_null($node_ha['id_instance']));
+        }
+        else {
+            $id_instance = "''";
+        }
+        if (isset($node_ha['id_course']) and ($node_ha['parent_id'] == null || $node_ha['parent_id'] == '')) {
+            $new_node_id = $node_ha['id_course']. '_' . '0';
+        } else {
+            $parentId = $node_ha['parent_id'];
+            $regExp = '#^([1-9][0-9]*)_#';                        
+            preg_match($regExp, $parentId, $stringFound);
+            if (count($stringFound) > 0) {
+                $idCourse = $stringFound[1];
+                
+                $last_node = $this->get_max_idFN($idCourse);
+                $tempAr = explode ("_", $last_node);
+                $newId =intval($tempAr[1]) + 1;
+                $new_node_id = $idCourse . "_" . $newId;
+            }
+        }
+            $id_node = $this->sql_prepared($new_node_id);
+
+        // insert a row into table nodo
+        $sql  = "insert into nodo (id_nodo, id_utente,id_posizione, nome, titolo, testo, tipo, data_creazione, id_nodo_parent, ordine, livello, versione, n_contatti, icona, colore_didascalia, colore_sfondo, correttezza, copyright, lingua, pubblicato, id_istanza)";
+        $sql .= " values ($id_node,  $id_author, $id_position, $name, $title, $text, $type, $creation_date, $parent_id, $order, $level, $version, $n_contacts, $icon, $color, $bgcolor, $correctness, $copyright, $lingua, $pubblicato, $id_instance)";
+        ADALogger::log_db("trying inserting the node: $sql");
+
+        $res = $db->query($sql);
+        // if an error is detected, an error is created and reported
+        if (AMA_DB::isError($res)) {
+            return new AMA_Error($this->errorMessage(AMA_ERR_ADD) . " while in _add_node." .
+                            AMA_SEP . ": " . $res->getMessage());
+        }
+
+        
+        // the sql_prepared form will be of unvaluable help in the future
+        $sqlnode_id = $this->sql_prepared($id_node);
+
+        /*
+     * if exists a parent node for this node, check if it has type ADA_LEAF_TYPE
+     * and change it in ADA_GROUP_TYPE
+        */
+        if( isset($node_ha['parent_id']) && ($node_ha['parent_id'] != "") ) {
+            $parent_node_ha = $this->get_node_info($node_ha['parent_id']);
+            if(!AMA_DB::isError($parent_node_ha)) {
+                if ( $parent_node_ha['type'] == ADA_LEAF_TYPE ) {
+                    $result = $this->change_node_type($node_ha['parent_id'], ADA_GROUP_TYPE);
+                    if ( AMA_DB::isError($parent_node_ha) ) {
+                        return $result;
+                    }
+                }
+            }
+        }
+        return $new_node_id;
+    }
     
     /**
      * list job offers
@@ -236,7 +421,7 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
     public function listOffers($condition='where 1') {
         $db =& $this->getConnection();
         if (self::isError($db)) return $db;
-        $sql = 'SELECT O.*,C.* FROM `OL_jobOffers` as O, `OL_CPI` as C '. ' ' .$condition.
+        $sql = 'SELECT  O.*, C.*  FROM `OL_jobOffers` as O, `OL_CPI` as C '. ' ' .$condition.
                 ' AND O.idCPI = C.idCPI' ; 
 //        print_r($sql);
         $res =  $this->getAllPrepared($sql, null, AMA_FETCH_ASSOC);
@@ -318,4 +503,24 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
 
         return $db->lastInsertID();
     }    
+    
+    function get_max_idFN($id_course=1,$id_toc='',$depth=1){
+      // return the max id_node of the course
+      $dh = $GLOBALS['dh'];
+      $id_node_max = $dh->_get_max_idFN($id_course,$id_toc,$depth);
+      // vito, 15/07/2009
+      if (AMA_DataHandler::isError($id_node_max)) {
+        /*
+         * Return a ADA_Error object with delayedErrorHandling set to TRUE.
+         */
+          return new ADA_Error(
+            $id_node_max,translateFN('Errore in lettura max id'),
+            'get_max_idFN',
+            NULL,NULL,NULL,TRUE
+          );
+      }
+      return $id_node_max;
+    }
+
+    
 }
