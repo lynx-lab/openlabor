@@ -46,7 +46,7 @@ require_once('./controllers/errorController.inc.php');
 require_once(__DIR__ . '/include/extract_class.inc.php');
 require_once('./include/restRequest.inc.php');
 require_once('include/AMAOpenLaborDataHandler.inc.php');
-
+require_once('include/apiInit.inc.php');
 
 
 

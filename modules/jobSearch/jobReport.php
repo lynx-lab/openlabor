@@ -134,7 +134,8 @@ if(isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'POST') {
 //  $optionsAr = array('onload_func' => "close_page('$close_page_message');");
 //  $optionsAr = array('onload_func' => "dataTablesExec('$userLanguage');");
 //  print_r($userLanguage);
-    $data=translateFN('Successful reported job with id').' ' .$jobsCode;
+    $jobIdAr = json_decode($jobsCode, true);
+    $data=translateFN('Successful reported job with id').' ' .$jobIdAr['AddedJobId'];
 } else {
     $help = translateFN('Send a job offer'); 
     $jobReportForm = new JobReportForm();

@@ -6,6 +6,7 @@
  * @license	http://www.gnu.org/licenses/gpl-2.0.html GNU Public License v.2
  * @version	0.1
  */
+
 class AMAOpenLaborDataHandler extends AMA_DataHandler {
 
     /**
@@ -161,8 +162,7 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
 
 
     /**
-     * @abstract add job offer to table
-     * @todo add a node each job
+     * add job offer to table
      */
     public function addJobOffer($JobData) {
         $db =& $this->getConnection();
@@ -249,7 +249,7 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
         return $jobId;
     }
         
- 
+
     /**
      * @author graffio  <graffio@lynxlab.com
      * @param Array $dataAr Job Offer data
@@ -258,6 +258,7 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
      * @return string $insertedNodeId the Id of node related o job offer to whom the node is child
      */
     public function addNodeJob($dataAr, $serviceId = null, $instanceId = null) {
+        $common_dh = $GLOBALS['common_dh'];
         if ($serviceId == null) {
             $node_ha['id_course'] = ADA_JOB_SERVICE_ID;
             $node_ha['parent_id'] = ADA_JOB_SERVICE_ID.'_0';            
@@ -273,19 +274,19 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
         }
         
         $node_ha['id_node_author'] = 1; // assuming ADMIN of platform
-        if (is_int($dataAr['sourceJob']) && $dataAr['sourceJob'] > 0) {
-            $node_ha['id_node_author'] = $dataAr['sourceJob'];
-        } elseif (DataValidator::validate_email ($dataAr['sourceJob'])) {
-            $id_node_author = $dh->find_user_from_username($dataAr['sourceJob']);
+        if (is_int($dataAr['source']) && $dataAr['source'] > 0) {
+            $node_ha['id_node_author'] = $dataAr['source'];
+        } elseif (DataValidator::validate_email ($dataAr['source'])) {
+            $id_node_author = $common_dh->find_user_from_email($dataAr['source']);
             if (!AMA_DB::isError($id_node_author)) $node_ha['id_node_author'] = $id_node_author;
         }
         
 
-        $node_ha['name'] = $dataAr['positionCode'];
-        $node_ha['title'] = $dataAr['position'];
+        $node_ha['title'] = $dataAr['positionCode'];
+        $node_ha['name'] = $dataAr['position'];
         $node_ha['text'] = $dataAr['professionalProfile'].PHP_EOL.$dataAr['notes'].PHP_EOL.$dataAr['professionalProfile'];
         $node_ha['type'] = ADA_LEAF_TYPE;
-        $node_ha['creation_date'] = $this->date_to_ts(time());
+        $node_ha['creation_date'] = $this->ts_to_date(time());
 
         $node_ha['order'] = $node_ha['order'];
         $node_ha['level'] = '0';
@@ -336,7 +337,7 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
 
         $text = $this->sql_prepared($node_ha['text']);
         $type = $this->sql_prepared($this->or_zero($node_ha['type']));
-        $creation_date = $this->date_to_ts($this->or_null($node_ha['creation_date']));
+        $creation_date = time(); //$this->date_to_ts($this->or_null($node_ha['creation_date']));
         $parent_id = $this->sql_prepared($node_ha['parent_id']);
         $order = $this->sql_prepared($this->or_null($node_ha['order']));
         $level = $this->sql_prepared($this->or_zero($node_ha['level']));

@@ -42,12 +42,12 @@ class RequestsController extends openLaborController {
     }
 
     /**
-     *  @abstract job report
+     *  method to job report
      *  @param array $request contains data of job report
      *  @param string $format contains type of format (xml, json)
      *  @param 
      */
-    public function post002Action($dataAr,$format,$url_parameters) {
+    public function post002Action($dataAr,$format) {
         require_once(__DIR__ .'/../include/config.inc.php');
 
         $dataAr = $this->dataValidator($dataAr);
@@ -57,73 +57,134 @@ class RequestsController extends openLaborController {
             $dataAr['positionCode'] = $this->getJobCode($dataAr['position']);
         }
         $InsertId = $this->reportJob($dataAr);
-        if(!AMA_DataHandler::isError($InsertId)) {
-            $insertedNodeId = $this->addNodeJob($dataAr,$InsertId);
-        }
+        $inserIdAr['AddedJobId'] = $InsertId;
         
         /*
          * view result in correct format
          */
         if ($format == 'xml') {
-                $jobResult = openLaborController::array2xml($jobResult,'job');
+                $jobResult = openLaborController::array2xml($inserIdAr,'job');
                 $jobResult= str_replace('&', '&amp;',$jobResult);
                 header ("Content-type: text/xml");
             } else {
                 header('Content-Type: application/json; charset=utf8');
-                $idResult = json_encode($InsertId);
+                $jobResult = json_encode($inserIdAr);
         }
-        echo $idResult;
+        echo $jobResult;
     }        
-
+    
     /**
-     * @author graffio  <graffio@lynxlab.com
-     * @param Array $dataAr Job Offer data
-     * @param Int $jobId the Id of job offer inserted
-     * @param INT $serviceId the Id of service to wh
-     * @return string $insertedNodeId the Id of node related o job offer to whom the node is child
+     * method to comment a job offer
+     * @param array $dataAr contains: authorId, jobId, NodeJobId (node parent), commentText
+     * @param string $format the data format (xml,json)
+     * @return string NodeId of comment
+     * 
      */
-    private function addNodeJob($dataAr,$jobId, $serviceId = null) {
-        if ($serviceId == null) {
-            
+    public function post003Action($dataAr = array(),$format = 'json',$url_parameters, $c_published = false) {
+        require_once(__DIR__ .'/../include/config.inc.php');
+
+        $dataAr = $this->dataCommentValidator($dataAr);
+        $jobId = $dataAr['job_id'];
+        $text4Report = 'comment to'. ' ' .$dataAr['job_id'];
+        $this->LogReport($_REQUEST,$_SERVER,$text4Report);
+        
+        /*
+         * get job data
+         */
+        $jobsData = $this->getJob($jobId);
+        if (AMA_DB::isError($jobsData)) {
+            $controller = new errorController();
+            $errorMsg = translateFN('Error reading Job id') . ' '.  $jobId;
+            $controller->printError('POST',$format,$errorMsg);
         } else {
-            $GLOBALS['dh'] = AMAOpenLaborDataHandler::instance(MultiPort::getDSN(DATA_PROVIDER));
-            $dh = $GLOBALS['dh'];
-            $node_ha['id_course'] = ADA_JOB_SERVICE_ID;
-            $node_ha['parent_id'] == ADA_JOB_SERVICE_ID.'_0';
-                    
-            $node_ha['id_author'] = 1; // assuming ADMIN of platform
-            if (is_int($dataAr['sourceJob']) && $dataAr > 0) {
-                $node_ha['id_author'] = $dataAr['sourceJob'];
+            $jobData = $jobsData[0];
+            $InsertId = $this->addCommentToJob($dataAr,$jobData);
+            if (AMA_DB::isError($jobData)) {
+                $controller = new errorController();
+                $errorMsg = 'Error writing comment to Job' . ' '.  $jobId;
+                $controller->printError('POST',$format,$errorMsg);
+            } else {
+                $inserIdAr['AddedCommentToJobId'] = $InsertId;
+
+                /*
+                 * view result in correct format
+                 */
+                if ($format == 'xml') {
+                        $jobResult = openLaborController::array2xml($inserIdAr,'job_comment');
+                        $jobResult= str_replace('&', '&amp;',$jobResult);
+                        header ("Content-type: text/xml");
+                    } else {
+                        header('Content-Type: application/json; charset=utf8');
+                        $jobResult = json_encode($inserIdAr);
+                }
+                echo $jobResult;
             }
-            
-            $node_ha['name'] = $this->sql_prepared($this->or_null($dataAr['positionCode']));
-            $node_ha['title'] = $this->sql_prepared($this->or_null($dataAr['position']));
-            $node_ha['text'] = $this->sql_prepared($dataAr['professionalProfile'].PHP_EOL.$dataAr['notes'].PHP_EOL.$dataAr['professionalProfile']);
-            $node_ha['type'] = $this->sql_prepared(ADA_LEAF_TYPE);
-            $node_ha['creation_date'] = $this->date_to_ts(time());
 
-            $node_ha['order'] = $this->sql_prepared($this->or_null($node_ha['order']));
-            $node_ha['level'] = $this->sql_prepared($this->or_zero($node_ha['level']));
-            $node_ha['vesion'] = $this->sql_prepared($this->or_zero($node_ha['version']));
-            $node_ha['n_contacts'] = $this->sql_prepared($this->or_zero($node_ha['n_contacts']));
-            $node_ha['icon'] = $this->sql_prepared($this->or_null($node_ha['icon']));
-
-            $node_ha['bgcolor'] = $this->sql_prepared($this->or_null($node_ha['bgcolor']));
-            $node_ha['color'] = $this->sql_prepared($this->or_null($node_ha['color']));
-            $node_ha['correctness'] = $this->sql_prepared($this->or_zero($node_ha['correctness']));
-            $node_ha['copyright'] = $this->sql_prepared($this->or_zero($node_ha['copyright']));
-            $node_ha['id_position'] = $this->sql_prepared($node_ha['id_position']);
-            $node_ha['lingua'] = $this->sql_prepared($dataAr['locale']);
-            $node_ha['pubblicato'] = $this->sql_prepared($dataAr['published']);
-            
-            $idNode = $dh->_add_node($node_ha);
-            
         }
         
     }
-      
-    private function getJob($jobId) {
-        $GLOBALS['dh'] = AMAOpenLaborDataHandler::instance(MultiPort::getDSN(DATA_PROVIDER));
+    
+    private function addCommentToJob($dataAr,$jobData, $serviceId = null, $instanceId= null) {
+            $GLOBALS['dh'] = AMAOpenLaborDataHandler::instance(MultiPort::getDSN(DATA_PROVIDER));
+            $dh = $GLOBALS['dh'];
+            $common_dh = $GLOBALS['common_dh'];
+            $node_ha['parent_id'] = $jobData['j_idNode'];
+            
+            $node_ha['name'] = $jobData['position'];
+            $node_ha['title'] = $jobData['positionCode'];
+            $node_ha['text'] = $dataAr['comment_text'];
+            $node_ha['type'] = ADA_NOTE_TYPE;
+            $node_ha['creation_date'] = $dh->ts_to_date(time());
+//            print_r($dh->get_node_info($node_ha['parent_id']));
+
+            $node_ha['order'] = $node_ha['order'];
+            $node_ha['level'] = '0';
+            $node_ha['vesion'] = '0';
+            $node_ha['n_contacts'] = 0;
+            $node_ha['icon'] = '';
+
+            $node_ha['bgcolor'] = '';
+            $node_ha['color'] = '';
+            $node_ha['correctness'] = '';
+            $node_ha['copyright'] = '0';
+            $node_ha['id_position'] = '';
+            $node_ha['lingua'] = $dataAr['locale'];
+            $node_ha['pubblicato'] = $published;
+
+            if ($serviceId == null) {
+                $node_ha['id_course'] = ADA_JOB_SERVICE_ID;
+            } else {
+                $node_ha['id_course'] = $serviceId;
+            }
+
+            if ($instanceId == null) {
+                $node_ha['id_instance'] = ADA_JOB_INSTANCE_SERVICE_ID;
+            } else {
+                $node_ha['id_instance'] = $instanceId;
+            }
+
+            $node_ha['id_node_author'] = 1; // assuming ADMIN of platform
+            if (is_int($dataAr['c_user']) && $dataAr['c_user'] > 0) {
+                $node_ha['id_node_author'] = $dataAr['c_user'];
+            } elseif (DataValidator::validate_email ($dataAr['c_user'])) {
+                $id_node_author = $common_dh->find_user_from_email($dataAr['c_user']);
+                if (!AMA_DB::isError($id_node_author)) $node_ha['id_node_author'] = $id_node_author;
+            }            
+        
+            $InsertId = $dh->add_node($node_ha);
+            return $InsertId;
+    }
+     /**
+     * method to retrieve a job offer
+     * @param int $jobId the id of job to retrieve
+     * @return array $jobOffer 
+     * 
+     */
+    private function getJob($jobId, $dataProvider = null) {
+        if ($dataProvider == null) {
+            $dataProvider = DATA_PROVIDER;
+        }
+        $GLOBALS['dh'] = AMAOpenLaborDataHandler::instance(MultiPort::getDSN($dataProvider));
         $dh = $GLOBALS['dh'];
         $jobOffer = $dh->getJobFromId($jobId);
 //        $jobOfferJson = json_encode($jobOffer);
@@ -270,7 +331,7 @@ class RequestsController extends openLaborController {
         return $jobOffers;
     }
     /**
-     * @abstract validate data sended by user
+     * validate data sended by user
      * @param array $dataAr contains the data POSTED
      * @return array  $dataAr contains the data validated
      */
@@ -312,37 +373,24 @@ class RequestsController extends openLaborController {
         return $dataAr;
 
     } 
+    
+    private function dataCommentValidator($dataAr) {
+        $dataAr['api_key'] = DataValidator::validate_string($dataAr['api_key']);
+        $dataAr['jurisdiction_id'] = DataValidator::validate_string($dataAr['jurisdiction_id']);
+        $dataAr['locale'] = DataValidator::validate_string($dataAr['locale']);
+        $dataAr['job_id'] = DataValidator::is_uinteger($dataAr['job_id']);
+        $dataAr['comment_text'] = DataValidator::validate_string($dataAr['comment_text']);
+        $dataAr['c_latitude'] = DataValidator::validate_string($dataAr['c_latitude']);
+        $dataAr['c_longitude'] = DataValidator::validate_string($dataAr['c_longitude']);
+        $dataAr['c_user'] = DataValidator::validate_string($dataAr['c_user']);
+        $dataAr['media_url'] = DataValidator::validate_url($dataAr['media_url']);
+        $dataAr['c_user_firstname'] = DataValidator::validate_string($dataAr['c_user_firstname']);
+        $dataAr['c_user_surname'] = DataValidator::validate_string($dataAr['c_user_surname']);
+        $dataAr['c_published'] = $dataAr['c_published']; //boolean type 
+        return $dataAr;
 
-    public function getActionSimpleNOOOO($request) {
-        echo "<br />Siamo nel posto giusto: $request";
-        $remoteJobs = new remoteXMLResource(URL_OL_PROV_ROMA,$labels,$elements);
-        $cpiObj = new remoteXMLResource(URL_CPI,$cpiElements,$cpiElements);
-        $cpiAr = $cpiObj->contents;
-        $remoteJobs->search_data($toSearch,'ComuneAzienda',$cpiAr);
-    }
+    }     
+    
 
-    public function postActionNOOO($request) {
-//        print_r($request);
-        $this->LogReport($_REQUEST,$_SERVER,'postAction');
-        echo "postAction<br />Siamo nel posto giusto ". $request;
-        //print_r($request);
-        $remoteJobs = new remoteXMLResource(URL_OL_PROV_ROMA,$labels,$elements);
-        $cpiObj = new remoteXMLResource(URL_CPI,$cpiElements,$cpiElements);
-        $cpiAr = $cpiObj->contents;
-        $remoteJobs->search_data($toSearch,'ComuneAzienda',$cpiAr);
-    }
-      
 }
 
-/*
-        $remoteJobs = new remoteXMLResource(URL_OL_PROV_ROMA,$labels,$elements);
-        $cpiObj = new remoteXMLResource(URL_CPI,$cpiElements,$cpiElements);
-        $cpiAr = $cpiObj->contents;
-        $remoteJobs->search_data($toSearch,'ComuneAzienda',$cpiAr);
-//        print_r($remoteJobs->results);
- * 
- */
-
-
-
-?>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<service_definition>
+	<service_code>003</service_code>
+        <http_method>POST</http_method>
+	<attributes>
+		<attribute>
+			<variable>true</variable>
+			<code>api_key</code>
+			<datatype>string</datatype>
+			<required>true</required>
+			<datatype_description></datatype_description>		
+			<order>1</order>	
+			<description>api key</description>
+		</attribute>	
+		<attribute>
+			<variable>true</variable>
+			<code>jurisdiction_id </code>
+			<datatype>string</datatype>
+			<required>false</required>
+			<datatype_description>This is only required if the endpoint serves multiple jurisdictions</datatype_description>		
+			<order>2</order>	
+			<description>jurisdiction id</description>
+		</attribute>	
+		<attribute>
+			<variable>true</variable>
+			<code>locale</code>
+			<datatype>string</datatype>
+			<required>false</required>
+			<datatype_description>Choose of preferred language</datatype_description>		
+			<order>3</order>	
+			<description>language in format en_US, it_IT,</description>
+		</attribute>	
+		<attribute>
+			<variable>true</variable>
+			<code>job_id</code>
+			<datatype>int</datatype>
+			<required>true</required>
+			<datatype_description>Id of the job to be commented</datatype_description>		
+			<order>4</order>	
+			<description>Id of the job to be commented</description>
+		</attribute>	
+		<attribute>
+			<variable>true</variable>
+			<code>comment_text</code>
+			<datatype>text</datatype>
+			<required>true</required>
+			<datatype_description>The text of the comment</datatype_description>		
+			<order>5</order>	
+			<description>The text of the comment</description>
+		</attribute>	
+                                
+		<attribute>
+			<variable>true</variable>
+			<code>c_latitude</code>
+			<datatype>string</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>		
+			<order>6</order>	
+			<description>Latitude using the (WGS84) projection.</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>c_longitude</code>
+			<datatype>string</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>7</order>
+			<description>Longitude using the (WGS84) projection.</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>c_user</code>
+			<datatype>string</datatype>
+			<required>true</required>
+			<datatype_description></datatype_description>
+			<order>8</order>
+			<description>email address of the person who comment the job offer or his/her id</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>c_user_firstname</code>
+			<datatype>string</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>9</order>
+			<description>first name of the person who comment the job offer</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>c_user_surname</code>
+			<datatype>string</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>10</order>
+			<description>last name of the person who comment the job offer</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>c_published</code>
+			<datatype>boolean</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>11</order>
+			<description>whether the comment is published</description>
+		</attribute>
+	</attributes>
+</service_definition>
