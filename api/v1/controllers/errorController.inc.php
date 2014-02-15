@@ -7,10 +7,11 @@ class errorController extends openLaborController {
 		parent::__construct();
         }
 
-        public function printError($verb = 'no verb',$format = 'json', $message = 'generic', $parameters,$url_elements) {
+        public function printError($verb = 'no verb',$format = 'json', $message = 'generic', $httpStatus = '400',$parameters,$url_elements) {
              /*
              * view result in correct format
              */
+            header("Status: " . $httpStatus, false, $httpStatus);
             if ($format == 'xml') {
                 $errorResult= str_replace('&', '&amp;',$message);
                 header ("Content-type: text/xml");

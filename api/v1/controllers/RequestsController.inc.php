@@ -4,7 +4,7 @@ class RequestsController extends openLaborController {
     
     /**
      * 
-     * class per jobs search
+     * jobs search
      * @param type $request
      * @eturn $jobResult
      */
@@ -93,16 +93,18 @@ class RequestsController extends openLaborController {
          */
         $jobsData = $this->getJob($jobId);
         if (AMA_DB::isError($jobsData)) {
+            $httpStatus = '400';
             $controller = new errorController();
             $errorMsg = translateFN('Error reading Job id') . ' '.  $jobId;
-            $controller->printError('POST',$format,$errorMsg);
+            $controller->printError('POST',$format,$errorMsg,$httpStatus);
         } else {
             $jobData = $jobsData[0];
             $InsertId = $this->addCommentToJob($dataAr,$jobData);
             if (AMA_DB::isError($jobData)) {
+                $httpStatus = '400';
                 $controller = new errorController();
                 $errorMsg = 'Error writing comment to Job' . ' '.  $jobId;
-                $controller->printError('POST',$format,$errorMsg);
+                $controller->printError('POST',$format,$errorMsg, $httpStatus);
             } else {
                 $inserIdAr['AddedCommentToJobId'] = $InsertId;
 
@@ -238,7 +240,7 @@ class RequestsController extends openLaborController {
     }
     
      /**
-      * @abstract search engine
+      * search engine
       * 
       * @param $toSearch
       * @param $keyMandatory
@@ -326,7 +328,7 @@ class RequestsController extends openLaborController {
                 $clause .= ' AND '. constant($toSearch['qualificationRequired']);
             }        
 
-            $jobOffers = $dh->listOffers($clause);
+            $jobOffers = $dh->listJobOffers($clause);
         }
         return $jobOffers;
     }
@@ -374,6 +376,152 @@ class RequestsController extends openLaborController {
 
     } 
     
+    /*********************************************
+     * TRAINING AREA
+     */
+    
+    /**
+     * 
+     * @param type $dataAr
+     * @return type
+     */
+        /**
+     * 
+     * jobs search
+     * @param type $request
+     * @eturn $jobResult
+     */
+    public function get005Action($request,$format='xml',$url_parameters) {
+        require_once(__DIR__ .'/../include/config.inc.php');
+        if (!isset($request['t_ID'])) {
+            $toSearch = array();
+            $toSearch['keywords'] = $request['keywords'];
+            $toSearch['cityCompany'] = $request['city'];
+            $toSearch['qualificationRequired'] = $request['qualification'];
+            $trainingResult = $this->searchTraining($toSearch,'cityCompany');
+            $NumResult = count($trainingResults);
+            
+        } else {
+            $trainingResult = $this->getTraining($request['t_ID']);
+        }
+        $this->LogRequest($_REQUEST,$_SERVER,$NumResult);
+
+        /*
+         * view result in correct format
+         */
+        if ($format == 'xml') {
+            $trainingResult = openLaborController::array2xml($trainingResult,'training');
+            $trainingResult = str_replace('&', '&amp;',$trainingResult);
+            header ("Content-type: text/xml");
+        } else {
+            header('Content-Type: application/json; charset=utf8');
+            $trainingResult = json_encode($trainingResult);
+        }
+        echo $trainingResult;
+    }
+
+         /**
+      * @abstract search engine
+      * 
+      * @param $toSearch
+      * @param $keyMandatory
+      * @return $jobOffers
+      */
+    private function searchTraining($toSearch=array(),$keyMandatory=null) {
+        $GLOBALS['dh'] = AMAOpenLaborDataHandler::instance(MultiPort::getDSN(ADA_TRAINING_SERVICE_PROVIDER));
+        $dh = $GLOBALS['dh'];
+        
+        $today_date = today_dateFN();
+        $todayUT = Abstract_AMA_DataHandler::date_to_ts($today_date);
+
+        $clause = 'where t_expiration >= '.$todayUT . ' OR  t_expiration = 0';
+        
+        /**
+         * case 1: keywords set, professional code match with keywords
+         *          look for other parameters
+         * case 2: keywords set, no professional code match with keywords
+         *          no look for other parameters
+         * case 3: keywords not set
+         *          look for other parameters
+         * 
+         */
+        
+        $foundKeywords = true;
+        if ($toSearch['keywords'] != '' && $toSearch['keywords'] != null) {
+
+            $foundKeywords = false;
+
+            $curlPost = false;
+            $urlSemanticApi = URL_LAVORI4.$toSearch['keywords'];
+            $keywords = $toSearch['keywords'];
+            //$curlHeader = array("Content-Type: application/x-www-form-urlencoded");
+            $curlHeader = '';
+            $jobsCode = REST_request::sendRequest($keywords,$curlHeader,$urlSemanticApi,$curlPost);
+            
+            $resultAR = json_decode($jobsCode, TRUE);
+            if (count($resultAR) > 0) {
+                $professionCodes = $resultAR['job_types']['categories'];
+                if (count($professionCodes) > 0) {
+                    $foundKeywords = true;
+                    
+                    $clause .= ' AND ';
+
+                    $numberCode = NUMBER_CODE;
+                    if ((count($professionCodes))  <= NUMBER_CODE) {
+                        $numberCode = count($professionCodes);
+                    }
+                    $clauseKey = NULL;
+                    
+                    /**
+                     * @todo find the way to order the results by professional code order in the array $professionalCode
+                     */
+                    for ($i=0; $i<$numberCode;$i++) {
+                        $professionCode = $professionCodes[$i]['category'];
+                        switch ($i) {
+                            case 0:
+                                $clauseKey = '(trainingCode like \''.$professionCode.'%\'';
+                                break;
+                            /*
+                            case $numberCode:
+                                $clause .= ' OR positionCode like \''.$professionalCode.'%\')';
+                                break;
+                             * 
+                             */
+                            default:
+                                $clauseKey .= ' OR trainingCode like \''.$professionCode.'%\'';
+                                break;
+                        }
+                    }
+                    if ($clauseKey != NULL) {
+                        $clause .= ' '. $clauseKey.')';
+                    }
+                }
+                
+            }
+        }
+        if ($foundKeywords) {
+            
+            if ($toSearch['cityCompany'] != '' && $toSearch['cityCompany'] != null) {
+                $clause .= ' AND company = \''. $toSearch['cityCompany'].'\'';
+            }
+
+            if ($toSearch['qualificationRequired'] != '' && $toSearch['qualificationRequired'] != null) {
+                $clause .= ' AND '. constant($toSearch['qualificationRequired']);
+                $clause = str_replace('qualificationRequired', 't_qualificationRequired', $clause);
+            }
+            
+
+            $trainingOffers = $dh->listTrainingOffers($clause);
+        }
+        return $trainingOffers;
+    }
+
+    
+    /**
+     * Validate the data need to comment a job or a trining
+     * @param array $dataAr
+     * @return array
+     */
     private function dataCommentValidator($dataAr) {
         $dataAr['api_key'] = DataValidator::validate_string($dataAr['api_key']);
         $dataAr['jurisdiction_id'] = DataValidator::validate_string($dataAr['jurisdiction_id']);

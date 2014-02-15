@@ -100,14 +100,16 @@ if (class_exists($controller_name)) {
     }
     else {
         $controller = new errorController();
-        $errorMsg = 'method required does not exist';
-        $controller->printError($verb,$requestObj->format,$errorMsg,$requestObj->parameters,$url_elements);        
+        $errorMsg = 'method required does not exist' .': '. $action_name;
+        $httpStatus = '404';
+        $controller->printError($verb,$requestObj->format,$errorMsg,$httpStatus,$requestObj->parameters,$url_elements);        
     }
 } else {
     $controller = new errorController();
 //    $errorMsg = translateFN('URL malformed');
     $errorMsg = 'URL malformed';
-    $controller->printError($verb,$requestObj->format,$errorMsg,$requestObj->parameters,$url_elements);
+    $httpStatus = '404';
+    $controller->printError($verb,$requestObj->format,$errorMsg,$httpStatus,$requestObj->parameters,$url_elements);
 }
 
 class Request {

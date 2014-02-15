@@ -40,7 +40,7 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
     public function addJobOffers ($jobsData) {
         $db =& $this->getConnection();
         if (self::isError($db)) return $db;
-        $oldOffers = $this->listOffers();
+        $oldOffers = $this->listJobOffers();
         $i=0;
         $o=0;
         foreach ($jobsData as $oneJobData) {
@@ -306,6 +306,265 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
         return $idNode;
         
     }
+   
+        /**
+     * add job offers
+     * 
+     * @access public
+     * 
+     * @param array $jobData contains all the jobs offer data
+     * 
+     * @return an error if something goes wrong or true
+     */
+    
+    public function addTrainingOffers ($trainingsData) {
+        $db =& $this->getConnection();
+        if (self::isError($db)) return $db;
+        $oldTrainings = $this->listTrainingOffers();
+        $i=0;
+        $o=0;
+        foreach ($trainingsData as $oneTrainingData) {
+            if (count($oldTrainings) == 0) {
+                 $idInserted[$i] = $this->addTrainingOffer($oneTrainingData);
+            } else {
+                $TrainingAlreadyExists = false;
+//                foreach ($oldOffers as $oneOldOffer) {
+//                    if (in_array($oneJobData['idJobOriginal'],$oneOldOffer)) {
+                foreach ($oldTrainings as $oldOneTraining) {
+                    if ($oneTrainingData['IdJobOriginal'] == $oldOneTraining['idJobOriginal']) {
+                        unset($oldTrainings[$o]);
+                        $TrainingAlreadyExists = true;
+                        $o++;
+                        break;
+                    }
+                    $o++;
+                }
+                if ($TrainingAlreadyExists) {
+                    $idInserted[$i] = $this->updateTraining($oneTrainingData);
+                } else {
+                    $idInserted[$i] = $this->addTrainingOffer($oneTrainingData);
+                }
+            }
+            $i++;
+        }
+        return $idInserted;
+    }
+
+        /**
+     * add training offer to table
+     */
+    public function addTrainingOffer($TrainingData) {
+        $db =& $this->getConnection();
+        if (self::isError($db)) return $db;
+        if (!is_array($TrainingData)) return translateFN('dati non corretti');
+        
+        if (!is_int($TrainingData['$TrainingData'])) {
+            $trainingexpiration = Abstract_AMA_DataHandler::date_to_ts($TrainingData['trainingExpiration']); 
+        } else {
+            $trainingexpiration = $TrainingData['trainingExpiration'];
+        }
+        $TrainingData['t_idNode'] = '0';
+        $data = array(
+            'IdTrainingOriginal'=>$this->or_zero($TrainingData['IdTrainingOriginal']),
+            'nameTraining'=>$this->sql_prepared($TrainingData['nameTraining']),
+            'trainingCode'=>$this->sql_prepared($trainingCode),
+            'company'=>$this->sql_prepared($TrainingData['company']),
+            'trainingAddress'=>$this->sql_prepared($TrainingData['trainingAddress']),
+            'CAP'=>$this->sql_prepared($TrainingData['CAP']),
+            'city'=>$this->sql_prepared($TrainingData['city']),
+            'phone'=>$this->sql_prepared($TrainingData['phone']),
+            'durationHours'=>$this->or_zero($TrainingData['durationHours']),
+            'trainingType'=>$this->sql_prepared($TrainingData['trainingType']),
+            't_userType'=>$this->sql_prepared($TrainingData['userType']),
+            't_qualificationRequired'=>$this->sql_prepared($TrainingData['qualificationRequired']),
+            't_latitude'=>$this->sql_prepared($TrainingData['latitude']),
+            't_longitude'=>$this->sql_prepared($TrainingData['longitude']),
+            't_dateInsert'=>time(),
+            'hash'=>$this->sql_prepared($TrainingData['hash']),
+            't_source'=>$this->sql_prepared($TrainingData['source']),
+            
+            't_nation'=>$this->sql_prepared($TrainingData['nation']),
+            't_minAge'=>$this->sql_prepared($TrainingData['minAge']),
+            't_maxAge'=>$this->sql_prepared($TrainingData['maxAge']),
+            't_price'=>$this->sql_prepared($TrainingData['price']),
+            't_reservedForDisabled'=>$this->sql_prepared($TrainingData['reservedForDisabled']),
+            't_favoredCategoryRequests'=>$this->sql_prepared($TrainingData['favoredCategoryRequests']),
+            't_notes'=>$this->sql_prepared($TrainingData['notes']),
+            't_expiration'=>$this->or_zero($TrainingData['expiration']),
+            't_linkMoreInfo'=>$this->sql_prepared($TrainingData['linkMoreInfo']),
+            't_media_url'=>$this->sql_prepared($TrainingData['media_url']),
+            't_locale'=>$this->sql_prepared($TrainingData['locale']),
+            'sourceTrainingName'=>$this->sql_prepared($TrainingData['sourceTrainingName']),
+            'sourceTrainingSurname'=>$this->sql_prepared($TrainingData['sourceTrainingSurname']),
+            't_published'=>$this->sql_prepared($TrainingData['published']),
+            't_idNode'=>$this->sql_prepared($TrainingData['t_idNode'])
+                
+	);
+
+        //fine validazione campi
+        $keys = array_keys($data);
+
+        $sql = "INSERT INTO `OL_training` (".implode(',',$keys).") VALUES (".implode(",",$data).")";
+        ADALogger::log_db("trying inserting the training offer: ".$sql);
+
+        $res = $db->query($sql);
+        // if an error is detected, an error is created and reported
+        if (self::isError($res)) {
+            return new AMA_Error($this->errorMessage(AMA_ERR_ADD)." while in addTrainingOffer.".AMA_SEP.": ".$res->getMessage());
+        }
+        $trainingId = $db->lastInsertID();
+        $idNodeTraining = $this->addNodeTraining($TrainingData);
+        if (!self::isError($idNodeTraining) && $idNodeTraining != null) {
+            $TrainingData['t_idNode'] = $idNodeTraining;
+            $TrainingData['idTraining'] = $trainingId;            
+            $this->updateTraining($TrainingData);
+        }
+        unset($TrainingData);
+        
+        return $trainingId;
+    }
+
+    /**
+     * @author graffio  <graffio@lynxlab.com
+     * @param Array $dataAr Trainig Offer data
+     * @param Int $trainingId the Id of Training offer inserted
+     * @param INT $serviceId the Id of service to wh
+     * @return string $insertedNodeId the Id of node related to training offer to whom the node is child
+     */
+    public function addNodeTraining($dataAr, $serviceId = null, $instanceId = null) {
+        $common_dh = $GLOBALS['common_dh'];
+        if ($serviceId == null) {
+            $node_ha['id_course'] = ADA_TRAINING_SERVICE_ID;
+            $node_ha['parent_id'] = ADA_TRAINING_SERVICE_ID.'_0';            
+        } else {
+            $node_ha['id_course'] = $serviceId;
+            $node_ha['parent_id'] = $serviceId.'_0';
+        }
+        
+        if ($instanceId == null) {
+            $node_ha['id_instance'] = ADA_TRAINING_INSTANCE_SERVICE_ID;
+        } else {
+            $node_ha['id_instance'] = $instanceId;
+        }
+        
+        $node_ha['id_node_author'] = 1; // assuming ADMIN of platform
+        if (is_int($dataAr['t_sourceId']) && $dataAr['t_sourceId'] > 0) {
+            $node_ha['id_node_author'] = $dataAr['t_sourceId'];
+        } elseif (DataValidator::validate_email ($dataAr['t_sourceId'])) {
+            $id_node_author = $common_dh->find_user_from_email($dataAr['t_sourceId']);
+            if (!AMA_DB::isError($id_node_author)) $node_ha['id_node_author'] = $id_node_author;
+        }
+        
+
+        $node_ha['title'] = $dataAr['trainingCode'];
+        $node_ha['name'] = $dataAr['nameTraining'];
+        $node_ha['text'] = translateFN('Rilascia'). ': ' . $dataAr['trainingType'].PHP_EOL. translateFN('si rivolge: ') . ': '. $dataAr['t_userType'].
+                translateFN('è richiesta'). ': ' . $dataAr['t_qualificationRequired'] ;
+        $node_ha['type'] = ADA_LEAF_TYPE;
+        $node_ha['creation_date'] = $this->ts_to_date(time());
+
+        $node_ha['order'] = $node_ha['order'];
+        $node_ha['level'] = '0';
+        $node_ha['vesion'] = '0';
+        $node_ha['n_contacts'] = 0;
+        $node_ha['icon'] = '';
+
+        $node_ha['bgcolor'] = '';
+        $node_ha['color'] = '';
+        $node_ha['correctness'] = '';
+        $node_ha['copyright'] = '0';
+        $node_ha['id_position'] = '';
+        $node_ha['lingua'] = $dataAr['locale'];
+        $node_ha['pubblicato'] = $dataAr['published'];
+
+        $idNode = $this->add_node($node_ha);
+        return $idNode;
+        
+    }
+
+    
+    
+        public function updateTraining($TData) {
+        $db =& $this->getConnection();
+        if (self::isError($db)) return $db;
+        if (!is_array($TData)) return translateFN('dati non corretti');
+        
+        if (!is_int($TData['jobExpiration'])) {
+            $t_expiration = Abstract_AMA_DataHandler::date_to_ts($TData['t_expiration']); 
+        } else {
+            $t_expiration = $TData['t_expiration'];
+        }
+        $data = array();
+        $data = array(
+            $TData['IdTrainingOriginal'],
+            $t_expiration,
+            $TData['nameTraining'],
+            $TData['trainingCode'],
+            $TData['company'],
+            $TData['trainingAddress'],
+            $TData['CAP'],
+            
+            $TData['city'],
+            $TData['phone'],
+            $TData['durationHours'],
+            $TData['trainingType'],
+            $TData['t_userType'],
+            $TData['t_qualificationRequired'],
+            $TData['t_longitude'],
+            $TData['t_latitude'],
+            time(),
+            //$TData['t_dateInsert'],
+            $TData['hash'],
+            $TData['t_source'],
+            $TData['t_nation'],
+            $TData['t_minAge'],
+            $TData['t_maxAge'],
+            $TData['t_price'],
+            $TData['t_reservedForDisabled'],
+            $TData['t_favoredCategoryRequests'],
+            $TData['t_notes'],
+            $TData['t_linkMoreInfo'],
+            $TData['t_media_url'],
+            $TData['t_locale'],
+            $TData['sourceTrainingName'],
+            $TData['sourceTrainingSurname'],
+            $TData['t_published'],
+            $TData['t_idNode']
+	);
+        
+        /*
+         * needed to allow update from module proRoma.
+         * priority to idJobOriginal
+         */
+        $clause = 'IdTrainingOriginal=?';
+        if (isset($TData['IdTrainingOriginal']) && $TData['IdTrainingOriginal'] != 0) {
+            $data[] = $TData['IdTrainingOriginal'];
+            $clause = 'idTrainingOriginal=?';
+        }
+        elseif (isset($TData['idTraining']) && $TData['idTraining'] != 0) {
+            $data[] = $TData['idTraining'];
+            $clause = 'idTraining=?';
+        }
+//        unset($JobData);
+        //fine preparazione campi
+        
+        $update_sql = 'UPDATE OL_training SET idTrainingOriginal=?, t_expiration=?, nameTraining=?, trainingCode=?, company=?, trainingAddress=?,
+                CAP=?, city=?, phone=?, durationHours=?, trainingType=?, t_userType=?, t_qualificationRequired=?,t_longitude=?, 
+                t_latitude=?, t_dateInsert=?, hash=?, t_source=?, t_nation=?, t_minAge=?, t_maxAge=?, t_price=?, t_favoredCategoryRequests=?,
+                t_favoredCategoryRequests=?, t_notes=?, t_linkMoreInfo=?, t_media_url=?, t_locale=?, sourceTrainingName=?,sourceTrainingSurname=?,t_published=?,t_idNode=? 
+                where '.$clause; // idJobOriginal=?';
+        
+        ADALogger::log_db("trying updating the Training offer: ".$update_sql);
+        $res = $this->queryPrepared($update_sql, $data);
+        
+        // if an error is detected, an error is created and reported
+        if (self::isError($res)) {
+            return new AMA_Error($this->errorMessage(AMA_ERR_ADD)." while in updateJobOffer.".AMA_SEP.": ".$res->getMessage());
+        }
+        return TRUE;
+    }
+
+
     
     /**
      * Add a node
@@ -419,7 +678,7 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
      * 
      * @return an error if something goes wrong or an array contains all the offers
      */
-    public function listOffers($condition='where 1') {
+    public function listJobOffers($condition='where 1') {
         $db =& $this->getConnection();
         if (self::isError($db)) return $db;
         $sql = 'SELECT  O.*, C.*  FROM `OL_jobOffers` as O, `OL_CPI` as C '. ' ' .$condition.
@@ -438,6 +697,30 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
         $res =  $this->getAllPrepared($sql, null, AMA_FETCH_ASSOC);
         return $res;
     }
+    
+     /**
+     * list Training offers
+     * 
+     * @access public
+     * 
+     * @param 
+     * 
+     * @return an error if something goes wrong or an array contains all the offers
+     */
+    public function listTrainingOffers($condition='where 1') {
+        $db =& $this->getConnection();
+        if (self::isError($db)) return $db;
+        $sql = 'SELECT  T.*  FROM `OL_training` as T'. ' ' .$condition; 
+//        print_r($sql);
+        $res =  $this->getAllPrepared($sql, null, AMA_FETCH_ASSOC);
+        return $res;
+    }
+
+    
+    /** **********
+     * CPI AREA
+     * 
+     */
     
     /**
      * 
@@ -504,7 +787,10 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
 
         return $db->lastInsertID();
     }    
-    
+    /**
+     * return the max id node for a course
+     * 
+     */
     function get_max_idFN($id_course=1,$id_toc='',$depth=1){
       // return the max id_node of the course
       $dh = $GLOBALS['dh'];

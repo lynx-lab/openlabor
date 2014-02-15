@@ -6,22 +6,6 @@
 define('VERSION','v1');
 
 /*
- * URL of Semantic API
- */
-define('URL_LAVORI5','http://openlabor.lynxlab.com/services/search/lavori5/');
-define('URL_LAVORI4','http://openlabor.lynxlab.com/services/search/lavori4/');
-
-
-/*
- * Number of professional code to treat
- */
-define('NUMBER_CODE',4);
-
-define('DIR_INFO_SERVICES','doc_news');
-define('DISCOVERY_INFO',DIR_INFO_SERVICES.'/discovery.xml');
-define('SERVICES_INFO',DIR_INFO_SERVICES.'/services.xml');
-
-/*
  * PROVIDER IN WHICH SEARCH DATA
  */
 define('DATA_PROVIDER','client0');
@@ -40,11 +24,40 @@ define('ADA_JOB_SERVICE_ID','1');
  */
 define('ADA_JOB_INSTANCE_SERVICE_ID','6');
 
-/*
- * ADA SERVICE ID RELATED TO TRAINING OFFER DATA
+/**
+ * ADA SERVICE PROVIDER RELATED TO TRAINING OFFER DATA
  */
-define('ADA_TRAINING_SERVICE_ID','client0');
+define('ADA_TRAINING_SERVICE_PROVIDER','client0');
 
+/* 
+ * ADA SERVICE ID RELATED TO TRAINING OFFER DATA
+ * Va creato il servizio nel provider definito in ADA_TRAINING_SERVICE_PROVIDER
+ * (login come switcher, add service)
+ */
+define('ADA_TRAINING_SERVICE_ID','2');
+
+/*
+ * ADA INSTANCE SERVICE ID RELATED TO TRAINING OFFER DATA
+ * Va creata l'instanza del servizio indicato in ADA_TRAINING_SERVICE_ID provider definito in ADA_TRAINING_SERVICE_PROVIDER
+ * (login come switcher, add service)
+ */
+define('ADA_TRAINING_INSTANCE_SERVICE_ID','7');
+
+/*
+ * URL of Semantic API
+ */
+define('URL_LAVORI5','http://openlabor.lynxlab.com/services/search/lavori5/');
+define('URL_LAVORI4','http://openlabor.lynxlab.com/services/search/lavori4/');
+
+
+/*
+ * Number of professional code to treat
+ */
+define('NUMBER_CODE',4);
+
+define('DIR_INFO_SERVICES','doc_news');
+define('DISCOVERY_INFO',DIR_INFO_SERVICES.'/discovery.xml');
+define('SERVICES_INFO',DIR_INFO_SERVICES.'/services.xml');
 
 /*
  * utility for query in educational qualification
