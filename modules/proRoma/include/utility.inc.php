@@ -24,5 +24,21 @@ class utility {
 //        return $jobsCode['job_types']['categories'][0]['category'];
         return $istatCode;
     }
-}
 
+
+   /*
+    * Log the request
+    */
+   public static function LogUpdate($text) {
+       $logRow = PHP_EOL;
+       $logFilename = 'updateReport.log'; //LOGFILEREPORT;
+       $logRow .= '|'.$text.PHP_EOL;
+
+       $fp = fopen($logFilename, "a+");
+       if ($fp){
+          fwrite($fp, $logRow);
+          fclose($fp);
+       } 
+   }
+   
+}

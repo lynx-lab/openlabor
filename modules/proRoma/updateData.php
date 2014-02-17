@@ -62,28 +62,57 @@ switch ($typeData) {
        print_r($Jobs);
 
     case 'training':
-        ob_end_flush();
        echo 'start time:' . AMA_DataHandler::ts_to_date(time(), "%d/%m/%Y %H:%M:%S") . '<BR />'; 
         
        $remoteTraining = new remoteXMLResource(URL_OF_NON_FINANZIATA_PROV_ROMA,$trainingLabels,$trainingElements);
        $TrainingData =  $remoteTraining->contents;
+       $logMsg = 'inizio import training';
+       utility::LogUpdate($logMsg);
+       $logMsg = ' start time:' . AMA_DataHandler::ts_to_date(time(), "%d/%m/%Y %H:%M:%S");
+       utility::LogUpdate($logMsg);
        if ($get_code) {
            $n = 0;
+           $nameTrainingAlreadyCoded = array();
            for ($index = 0; $index < count($TrainingData) -1; $index++) {
                $singleTraining = $TrainingData[$index];
-//           foreach ($TrainingData as $singleTraining) {
                $singleTraining['nameTraining'] = DataValidator::validate_string($singleTraining['nameTraining']);
-               if ($singleTraining['nameTraining'] != false && $singleTraining['nameTraining'] != '' )  {
-                   $singleTraining['trainingCode'] = utility::getIstatCode($singleTraining['nameTraining']);
-                    ob_end_flush();
-                   echo 'time to code:' . AMA_DataHandler::ts_to_date(time(), "%d/%m/%Y %H:%M:%S"). ' '. $singleTraining['trainingCode'] .'<BR />'; 
+               $codeExisting = array_search($singleTraining['nameTraining'], $nameTrainingAlreadyCoded);
+               if ($singleTraining['nameTraining'] != false && $singleTraining['nameTraining'] != '' && !$codeExisting)  {
+                   $logMsg = $index . ') getIstatCode for: ' . $singleTraining['nameTraining'];
+                   utility::LogUpdate($logMsg);   
+                   $timeStartIstatCode = time();
+                   /** 
+                    * Get ISTAT Code via CURL
+                    */
+                   $nameToSearch = urlencode($singleTraining['nameTraining']);
+//                   $singleTraining['trainingCode'] = utility::getIstatCode($singleTraining['nameTraining']);
+                   $singleTraining['trainingCode'] = utility::getIstatCode($nameToSearch);
+                   /*
+                    * 
+                    */
+                   sleep (2);
+                   $timeElapsed = time() - $timeStartIstatCode;
+                   $logMsg ='getIstatCode for: ' . $singleTraining['nameTraining']. ' return '. $singleTraining['trainingCode'] . ' Time elapsed: ' . $timeElapsed; 
+                   utility::LogUpdate($logMsg);   
                    $TrainingData[$index]['trainingCode'] = $singleTraining['trainingCode'];
+                   $nameTrainingAlreadyCoded[$singleTraining['trainingCode']] = $singleTraining['nameTraining'];
+
+               }else {
+                  $logMsg = 'getIstatCode: ' . $singleTraining['nameTraining'] . ' Already existing. Code: '. $codeExisting;
+                  utility::LogUpdate($logMsg);   
+                  $singleTraining['trainingCode'] = $codeExisting;
                }
            }
        }
+       $logMsg = 'number of imported training: ' . count($TrainingData);
+       utility::LogUpdate($logMsg);
+       $logMsg = 'number of Code: ' . count($nameTrainingAlreadyCoded);
+       utility::LogUpdate($logMsg);
+       $logMsg = 'end time:' . AMA_DataHandler::ts_to_date(time(), "%d/%m/%Y %H:%M:%S");
+       utility::LogUpdate($logMsg);
+       
        $Trainings = $dh->addTrainingOffers($TrainingData);
        var_dump($Trainings);
-        ob_end_flush();
        echo 'end time:' . AMA_DataHandler::ts_to_date(time(), "%d/%m/%Y %H:%M:%S"). '<BR />'; 
         break;
     
@@ -95,4 +124,3 @@ switch ($typeData) {
        break;
     
 }
-
