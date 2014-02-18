@@ -9,11 +9,7 @@ class RequestsController extends openLaborController {
      * @eturn $jobResult
      */
     public function get001Action($request,$format='xml',$url_parameters) {
-//        print_r($request);
-//    public function getActionSearch($request) {
         require_once(__DIR__ .'/../include/config.inc.php');
-//        echo "<br />Siamo nel posto giusto (getActionSearch): ";
-//        print_r($request);
         if (!isset($request['jobID'])) {
             $toSearch = array();
             $toSearch['keywords'] = $request['keywords'];
@@ -100,7 +96,7 @@ class RequestsController extends openLaborController {
         } else {
             $jobData = $jobsData[0];
             $InsertId = $this->addCommentToJob($dataAr,$jobData);
-            if (AMA_DB::isError($jobData)) {
+            if (AMA_DB::isError($InsertId)) {
                 $httpStatus = '400';
                 $controller = new errorController();
                 $errorMsg = 'Error writing comment to Job' . ' '.  $jobId;
@@ -195,7 +191,8 @@ class RequestsController extends openLaborController {
     }    
     
     /**
-     * @abstract return the code of position
+     * return the code of position or training name
+     * It use the semantic API (see: http://openlabor.lynxlab.com/services/doc/server.html)
      * @param string $position
      * @return string $positionCode
      * 
@@ -387,13 +384,13 @@ class RequestsController extends openLaborController {
      */
         /**
      * 
-     * jobs search
+     * Training search
      * @param type $request
      * @eturn $jobResult
      */
     public function get005Action($request,$format='xml',$url_parameters) {
         require_once(__DIR__ .'/../include/config.inc.php');
-        if (!isset($request['t_ID'])) {
+        if (!isset($request['ID'])) {
             $toSearch = array();
             $toSearch['keywords'] = $request['keywords'];
             $toSearch['cityCompany'] = $request['city'];
@@ -402,7 +399,7 @@ class RequestsController extends openLaborController {
             $NumResult = count($trainingResults);
             
         } else {
-            $trainingResult = $this->getTraining($request['t_ID']);
+            $trainingResult = $this->getTraining($request['ID']);
         }
         $this->LogRequest($_REQUEST,$_SERVER,$NumResult);
 
@@ -516,6 +513,124 @@ class RequestsController extends openLaborController {
         return $trainingOffers;
     }
 
+    /**
+     *  method to report a Training
+     *  @param array $request contains data of Training report
+     *  @param string $format contains type of format (xml, json)
+     *  @param 
+     */
+    public function post006Action($dataAr,$format) {
+        require_once(__DIR__ .'/../include/config.inc.php');
+
+        $dataAr = $this->dataTrainingValidator($dataAr);
+        $this->LogReport($_REQUEST,$_SERVER,$dataAr['nameTraining']);
+
+        if ($dataAr['nameTraining'] != false && ($dataAr['trainingCode'] == '' || $dataAr['trainingCode'] == false))  {
+            $dataAr['trainingCode'] = $this->getJobCode($dataAr['nameTraining']);
+        }
+        $InsertId = $this->reportTraining($dataAr);
+        $inserIdAr['AddedTrainingId'] = $InsertId;
+        
+        /*
+         * view result in correct format
+         */
+        if ($format == 'xml') {
+            $trainingResult = openLaborController::array2xml($inserIdAr,'training');
+            $trainingResult = str_replace('&', '&amp;',$trainingResult);
+            header ("Content-type: text/xml");
+        } else {
+            header('Content-Type: application/json; charset=utf8');
+            $trainingResult = json_encode($inserIdAr);
+        }
+        echo $trainingResult;
+
+    }            
+    
+        /**
+     * 
+     * @abstract add job reported to table jobs
+     *           if positionCode is not a valid code it ask to semantic api to have the right code
+     *          
+     * @param array $dataAr
+     */
+    private function reportTraining($dataAr=array()) {
+        $GLOBALS['dh'] = AMAOpenLaborDataHandler::instance(MultiPort::getDSN(DATA_PROVIDER));
+        $dh = $GLOBALS['dh'];
+        
+        if ($dataAr['TrainingCode'] == '') {
+            $urlSemanticApi = URL_LAVORI4.$dataAr['nameTraining'];
+            $keywords = $dataAr['nameTraining'];
+            //$curlHeader = array("Content-Type: application/x-www-form-urlencoded");
+            $curlHeader = '';
+            $jobsCode = REST_request::sendRequest($keywords,$curlHeader,$urlSemanticApi,$curlPost);
+            //$resultAR = json_decode($jobsCode, TRUE);
+        }
+//        print_r($dataAr);
+        $InsertId = $dh->addTrainingOffer($dataAr);
+        return $InsertId;
+    }
+     /**
+     * method to retrieve a Training offer
+     * @param int $trainingId the id of training to retrieve
+     * @return array $trainingOffer 
+     * 
+     */
+    private function getTraining($trainingId, $dataProvider = null) {
+        if ($dataProvider == null) {
+            $dataProvider = DATA_PROVIDER;
+        }
+        $GLOBALS['dh'] = AMAOpenLaborDataHandler::instance(MultiPort::getDSN($dataProvider));
+        $dh = $GLOBALS['dh'];
+        $trainingOffer = $dh->getTrainingFromId($trainingId);
+//        $jobOfferJson = json_encode($jobOffer);
+        return $trainingOffer;
+        //echo $jobOfferJson;
+    }    
+    
+    
+       /**
+     * validate data sended by user
+     * @param array $dataAr contains the data POSTED
+     * @return array  $dataAr contains the data validated
+     */
+    private function dataTrainingValidator($dataAr) {
+
+        $validDataAr['api_key'] = DataValidator::validate_string($dataAr['api_key']);
+        $validDataAr['jurisdiction_id'] = DataValidator::validate_string($dataAr['jurisdiction_id']);
+        $validDataAr['nameTraining'] = DataValidator::validate_string($dataAr['nameTraining']);
+        $validDataAr['trainingCode'] = DataValidator::validate_string($dataAr['trainingCode']);
+        $validDataAr['company'] = DataValidator::validate_string($dataAr['company']);
+        $validDataAr['trainingAddress'] = DataValidator::validate_string($dataAr['trainingAddress']);
+        $validDataAr['CAP'] = DataValidator::validate_string($dataAr['CAP']);
+        $validDataAr['city'] = DataValidator::validate_string($dataAr['city']);
+        $validDataAr['phone'] = DataValidator::validate_string($dataAr['phone']);
+        $validDataAr['durationHours'] = DataValidator::is_uinteger($dataAr['durationHours']);
+        $validDataAr['trainingType'] = DataValidator::validate_string($dataAr['trainingType']);
+        $validDataAr['userType'] = DataValidator::validate_string($dataAr['userType']);
+        $validDataAr['qualificationRequired'] = DataValidator::validate_string($dataAr['qualificationRequired']);
+        $validDataAr['longitude'] = DataValidator::validate_string($dataAr['longitude']);
+        $validDataAr['latitude'] = DataValidator::validate_string($dataAr['latitude']);
+        $validDataAr['hash'] = DataValidator::validate_string($dataAr['hash']);
+        $validDataAr['source'] = DataValidator::validate_string($dataAr['source']);
+        $validDataAr['nation'] = DataValidator::validate_string($dataAr['nation']);
+        $validDataAr['minAge'] = DataValidator::is_uinteger($dataAr['minAge']);
+        $validDataAr['maxAge'] = DataValidator::is_uinteger($dataAr['maxAge']);
+        $validDataAr['price'] = DataValidator::is_uinteger($dataAr['price']);
+        $validDataAr['reservedForDisabled'] = DataValidator::is_uinteger($dataAr['reservedForDisabled']); //boolean type 
+        $validDataAr['favoredCategoryRequests'] = DataValidator::validate_string($dataAr['favoredCategoryRequests']);
+       
+        $validDataAr['expiration'] = DataValidator::is_uinteger($dataAr['expiration']);
+        $validDataAr['notes'] = DataValidator::validate_string($dataAr['notes']);
+        $validDataAr['linkMoreInfo'] = DataValidator::validate_url($dataAr['linkMoreInfo']);
+        $validDataAr['media_url'] = DataValidator::validate_url($dataAr['media_url']);
+        $validDataAr['locale'] = DataValidator::validate_string($dataAr['locale']);
+
+        $validDataAr['sourceTrainingName'] = DataValidator::validate_string($dataAr['sourceTrainingName']);
+        $validDataAr['sourceTrainingSurname'] = DataValidator::validate_string($dataAr['sourceTrainingSurname']);
+        $validDataAr['published'] = DataValidator::is_uinteger($dataAr['published']); //boolean type 
+        return $validDataAr;
+
+    } 
     
     /**
      * Validate the data need to comment a job or a trining

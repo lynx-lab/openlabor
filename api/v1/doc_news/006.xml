@@ -32,12 +32,57 @@
 		</attribute>	
 		<attribute>
 			<variable>true</variable>
-			<code>companyName</code>
+			<code>company</code>
 			<datatype>string</datatype>
 			<required>true</required>
 			<datatype_description></datatype_description>		
 			<order>1</order>	
 			<description>The name of the company delivering the training</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>trainingAddress</code>
+			<datatype>string</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>		
+			<order>1</order>	
+			<description>address where the course takes place</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>CAP</code>
+			<datatype>string</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>		
+			<order>1</order>	
+			<description>ZIP code</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>city</code>
+			<datatype>string</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>		
+			<order>1</order>	
+			<description>City where the course takes place</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>nation</code>
+			<datatype>string</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>City where the course takes place</description>
+		</attribute>
+                <attribute>
+			<variable>true</variable>
+			<code>phone</code>
+			<datatype>string</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>		
+			<order>1</order>	
+			<description>contact of the company that delivers the training (email, phone, web site)</description>
 		</attribute>
 		<attribute>
 			<variable>true</variable>
@@ -105,43 +150,16 @@
 		</attribute>
 		<attribute>
 			<variable>true</variable>
-			<code>address</code>
-			<datatype>string</datatype>
-			<required>true</required>
-			<datatype_description></datatype_description>		
-			<order>2</order>	
-			<description>Human entered address or location</description>
-		</attribute>
-		<attribute>
-			<variable>true</variable>
-			<code>city</code>
-			<datatype>string</datatype>
-			<required>true</required>
-			<datatype_description></datatype_description>
-			<order>2</order>
-			<description>City in which training is delivered</description>
-		</attribute>
-		<attribute>
-			<variable>true</variable>
-			<code>contact</code>
-			<datatype>string</datatype>
-			<required>true</required>
-			<datatype_description></datatype_description>
-			<order>2</order>
-			<description>contact of the company that delivers the training (email, phone, web site)</description>
-		</attribute>
-		<attribute>
-			<variable>true</variable>
-			<code>QualificationRequired</code>
+			<code>longitude</code>
 			<datatype>string</datatype>
 			<required>false</required>
-			<datatype_description>qualification Required</datatype_description>		
-			<order>1</order>	
-			<description>Qualification Required</description>
-		</attribute>	
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>Longitude using the (WGS84) projection.</description>
+		</attribute>
 		<attribute>
 			<variable>true</variable>
-			<code>lat</code>
+			<code>latitude</code>
 			<datatype>string</datatype>
 			<required>false</required>
 			<datatype_description></datatype_description>		
@@ -150,16 +168,7 @@
 		</attribute>
 		<attribute>
 			<variable>true</variable>
-			<code>long</code>
-			<datatype>string</datatype>multiple attribute
-			<required>false</required>
-			<datatype_description></datatype_description>
-			<order>2</order>
-			<description>Longitude using the (WGS84) projection.</description>
-		</attribute>
-		<attribute>
-			<variable>true</variable>
-			<code>source_training</code>
+			<code>source</code>
 			<datatype>string</datatype>
 			<required>true</required>
 			<datatype_description></datatype_description>
@@ -168,6 +177,80 @@
 		</attribute>
 		<attribute>
 			<variable>true</variable>
+			<code>minAge</code>
+			<datatype>int</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>minimum age required</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>maxAge</code>
+			<datatype>int</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>maximum age required</description>
+		</attribute>		
+		<attribute>
+			<variable>true</variable>
+			<code>price</code>
+			<datatype>int</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>remuneration offered by the company</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>reservedForDisabled</code>
+			<datatype>booloean</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>whether the training is reserved to disable people</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>favoredCategoryRequests</code>
+			<datatype>string</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>to which kind of disabilities are reserved training (only if reserved for disabled is true)</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>expiration</code>
+			<datatype>int</datatype>
+			<required>true</required>
+			<datatype_description></datatype_description>		
+			<order>2</order>	
+			<description>deadline (in unixtime) to submit the training</description>
+		</attribute>
+
+                <attribute>
+			<variable>true</variable>
+			<code>notes</code>
+			<datatype>string</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>notes</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>linkMoreInfo</code>
+			<datatype>string</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>URL to more info about training offer</description>
+		</attribute>
+                
+                <attribute>
+			<variable>true</variable>
 			<code>media_url</code>
 			<datatype>string</datatype>
 			<required>false</required>
@@ -175,5 +258,43 @@
 			<order>2</order>
 			<description>URL to media</description>
 		</attribute>
-	</attributes>
+                
+		<attribute>
+			<variable>true</variable>
+			<code>locale</code>
+			<datatype>string</datatype>
+			<required>false</required>
+			<datatype_description>Choose of preferred language</datatype_description>		
+			<order>1</order>	
+			<description>language in format en_US, it_IT,</description>
+		</attribute>	
+
+                <attribute>
+			<variable>true</variable>
+			<code>sourceTrainingName</code>
+			<datatype>string</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>first name of the person who report the training offer or his/her id</description>
+		</attribute>
+		<attribute>
+			<variable>true</variable>
+			<code>sourceTrainingSurname</code>
+			<datatype>string</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>last name of the person who report the training offer or his/her id</description>
+		</attribute>	
+		<attribute>
+			<variable>true</variable>
+			<code>published</code>
+			<datatype>boolean</datatype>
+			<required>false</required>
+			<datatype_description></datatype_description>
+			<order>2</order>
+			<description>whether training offer is published</description>
+		</attribute>                
+        </attributes>
 </service_definition>

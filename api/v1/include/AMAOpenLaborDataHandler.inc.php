@@ -458,8 +458,7 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
 
         $node_ha['title'] = $dataAr['trainingCode'];
         $node_ha['name'] = $dataAr['nameTraining'];
-        $node_ha['text'] = translateFN('Rilascia'). ': ' . $dataAr['trainingType'].PHP_EOL. translateFN('si rivolge: ') . ': '. $dataAr['t_userType'].
-                translateFN('è richiesta'). ': ' . $dataAr['t_qualificationRequired'] ;
+        $node_ha['text'] = $dataAr['trainingType'].PHP_EOL. $dataAr['userType'].PHP_EOL. $dataAr['qualificationRequired'];
         $node_ha['type'] = ADA_LEAF_TYPE;
         $node_ha['creation_date'] = $this->ts_to_date(time());
 
@@ -489,10 +488,10 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
         if (self::isError($db)) return $db;
         if (!is_array($TData)) return translateFN('dati non corretti');
         
-        if (!is_int($TData['jobExpiration'])) {
-            $t_expiration = Abstract_AMA_DataHandler::date_to_ts($TData['t_expiration']); 
+        if (!is_int($TData['expiration'])) {
+            $t_expiration = Abstract_AMA_DataHandler::date_to_ts($TData['expiration']); 
         } else {
-            $t_expiration = $TData['t_expiration'];
+            $t_expiration = $TData['expiration'];
         }
         $data = array();
         $data = array(
@@ -508,20 +507,20 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
             $TData['phone'],
             $TData['durationHours'],
             $TData['trainingType'],
-            $TData['t_userType'],
-            $TData['t_qualificationRequired'],
-            $TData['t_longitude'],
-            $TData['t_latitude'],
+            $TData['userType'],
+            $TData['qualificationRequired'],
+            $TData['longitude'],
+            $TData['latitude'],
             time(),
             //$TData['t_dateInsert'],
             $TData['hash'],
-            $TData['t_source'],
-            $TData['t_nation'],
-            $TData['t_minAge'],
-            $TData['t_maxAge'],
-            $TData['t_price'],
-            $TData['t_reservedForDisabled'],
-            $TData['t_favoredCategoryRequests'],
+            $TData['source'],
+            $TData['nation'],
+            $TData['minAge'],
+            $TData['maxAge'],
+            $TData['price'],
+            $TData['reservedForDisabled'],
+            $TData['favoredCategoryRequests'],
             $TData['t_notes'],
             $TData['t_linkMoreInfo'],
             $TData['t_media_url'],
@@ -550,7 +549,7 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
         
         $update_sql = 'UPDATE OL_training SET idTrainingOriginal=?, t_expiration=?, nameTraining=?, trainingCode=?, company=?, trainingAddress=?,
                 CAP=?, city=?, phone=?, durationHours=?, trainingType=?, t_userType=?, t_qualificationRequired=?,t_longitude=?, 
-                t_latitude=?, t_dateInsert=?, hash=?, t_source=?, t_nation=?, t_minAge=?, t_maxAge=?, t_price=?, t_favoredCategoryRequests=?,
+                t_latitude=?, t_dateInsert=?, hash=?, t_source=?, t_nation=?, t_minAge=?, t_maxAge=?, t_price=?, t_reservedForDisabled=?,
                 t_favoredCategoryRequests=?, t_notes=?, t_linkMoreInfo=?, t_media_url=?, t_locale=?, sourceTrainingName=?,sourceTrainingSurname=?,t_published=?,t_idNode=? 
                 where '.$clause; // idJobOriginal=?';
         
@@ -716,6 +715,18 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
         return $res;
     }
 
+    /**
+     * retrive single Training Offers by ID
+     * @param INT $trainingId
+     * @return array $res
+     */
+    public function getTrainingFromId($trainingId) {
+        $db =& $this->getConnection();
+        if (self::isError($db)) return $db;
+        $sql = 'SELECT * FROM `OL_training` where idTraining = '.$trainingId; 
+        $res =  $this->getAllPrepared($sql, null, AMA_FETCH_ASSOC);
+        return $res;
+    }    
     
     /** **********
      * CPI AREA
