@@ -102,18 +102,18 @@ class RequestsController extends openLaborController {
                 $errorMsg = 'Error writing comment to Job' . ' '.  $jobId;
                 $controller->printError('POST',$format,$errorMsg, $httpStatus);
             } else {
-                $inserIdAr['AddedCommentToJobId'] = $InsertId;
+                $insertIdAr['AddedCommentToJobId'] = $InsertId;
 
                 /*
                  * view result in correct format
                  */
                 if ($format == 'xml') {
-                        $jobResult = openLaborController::array2xml($inserIdAr,'job_comment');
+                        $jobResult = openLaborController::array2xml($insertIdAr,'job_comment');
                         $jobResult= str_replace('&', '&amp;',$jobResult);
                         header ("Content-type: text/xml");
                     } else {
                         header('Content-Type: application/json; charset=utf8');
-                        $jobResult = json_encode($inserIdAr);
+                        $jobResult = json_encode($insertIdAr);
                 }
                 echo $jobResult;
             }
@@ -544,7 +544,60 @@ class RequestsController extends openLaborController {
         }
         echo $trainingResult;
 
-    }            
+    }
+    
+    /**
+     * method to comment a Training offer
+     * @param array $dataAr contains: authorId, trainingId, NodeTrainingId (node parent), commentText
+     * @param string $format the data format (xml,json)
+     * @return string NodeId of comment
+     * 
+     */
+    public function post007Action($dataAr = array(),$format = 'json',$url_parameters, $c_published = false) {
+        require_once(__DIR__ .'/../include/config.inc.php');
+
+        $dataAr = $this->dataCommentValidator($dataAr);
+        $trainingId = $dataAr['training_id'];
+        $text4Report = 'comment to'. ' ' .$dataAr['jtraining_id'];
+        $this->LogReport($_REQUEST,$_SERVER,$text4Report);
+        
+        /*
+         * get job data
+         */
+        $trainingData = $this->getTraining($trainingId);
+        if (AMA_DB::isError($trainingData)) {
+            $httpStatus = '400';
+            $controller = new errorController();
+            $errorMsg = translateFN('Error reading Training id') . ' '.  $jobId;
+            $controller->printError('POST',$format,$errorMsg,$httpStatus);
+        } else {
+            $trainingData = $trainingData[0];
+            $InsertId = $this->addCommentToTraining($dataAr,$trainingData);
+            if (AMA_DB::isError($InsertId)) {
+                $httpStatus = '400';
+                $controller = new errorController();
+                $errorMsg = 'Error writing comment to training' . ' '.  $trainingId;
+                $controller->printError('POST',$format,$errorMsg, $httpStatus);
+            } else {
+                $insertIdAr['AddedCommentToTrainingId'] = $InsertId;
+
+                /*
+                 * view result in correct format
+                 */
+                if ($format == 'xml') {
+                        $trainingResult = openLaborController::array2xml($insertIdAr,'training_comment');
+                        $trainingResult= str_replace('&', '&amp;',$trainingResult);
+                        header ("Content-type: text/xml");
+                    } else {
+                        header('Content-Type: application/json; charset=utf8');
+                        $trainingResult = json_encode($insertIdAr);
+                }
+                echo $trainingResult;
+            }
+
+        }
+        
+    }
     
         /**
      * 
@@ -587,6 +640,56 @@ class RequestsController extends openLaborController {
         //echo $jobOfferJson;
     }    
     
+    private function addCommentToTRaining($dataAr,$trainingData, $serviceId = null, $instanceId= null) {
+            $GLOBALS['dh'] = AMAOpenLaborDataHandler::instance(MultiPort::getDSN(DATA_PROVIDER));
+            $dh = $GLOBALS['dh'];
+            $common_dh = $GLOBALS['common_dh'];
+            $node_ha['parent_id'] = $trainingData['t_idNode'];
+            
+            $node_ha['name'] = $trainingData['nameTraining'];
+            $node_ha['title'] = $trainingData['trainingCode'];
+            $node_ha['text'] = $dataAr['comment_text'];
+            $node_ha['type'] = ADA_NOTE_TYPE;
+            $node_ha['creation_date'] = $dh->ts_to_date(time());
+//            print_r($dh->get_node_info($node_ha['parent_id']));
+
+            $node_ha['order'] = $node_ha['order'];
+            $node_ha['level'] = '0';
+            $node_ha['vesion'] = '0';
+            $node_ha['n_contacts'] = 0;
+            $node_ha['icon'] = '';
+
+            $node_ha['bgcolor'] = '';
+            $node_ha['color'] = '';
+            $node_ha['correctness'] = '';
+            $node_ha['copyright'] = '0';
+            $node_ha['id_position'] = '';
+            $node_ha['lingua'] = $dataAr['locale'];
+            $node_ha['pubblicato'] = $published;
+
+            if ($serviceId == null) {
+                $node_ha['id_course'] = ADA_TRAINING_SERVICE_ID;
+            } else {
+                $node_ha['id_course'] = $serviceId;
+            }
+
+            if ($instanceId == null) {
+                $node_ha['id_instance'] = ADA_TRAINING_INSTANCE_SERVICE_ID;
+            } else {
+                $node_ha['id_instance'] = $instanceId;
+            }
+
+            $node_ha['id_node_author'] = 1; // assuming ADMIN of platform
+            if (is_int($dataAr['c_user']) && $dataAr['c_user'] > 0) {
+                $node_ha['id_node_author'] = $dataAr['c_user'];
+            } elseif (DataValidator::validate_email ($dataAr['c_user'])) {
+                $id_node_author = $common_dh->find_user_from_email($dataAr['c_user']);
+                if (!AMA_DB::isError($id_node_author)) $node_ha['id_node_author'] = $id_node_author;
+            }            
+        
+            $InsertId = $dh->add_node($node_ha);
+            return $InsertId;
+    }
     
        /**
      * validate data sended by user
@@ -633,7 +736,7 @@ class RequestsController extends openLaborController {
     } 
     
     /**
-     * Validate the data need to comment a job or a trining
+     * Validate the data need to comment a job or a training
      * @param array $dataAr
      * @return array
      */
@@ -642,6 +745,7 @@ class RequestsController extends openLaborController {
         $dataAr['jurisdiction_id'] = DataValidator::validate_string($dataAr['jurisdiction_id']);
         $dataAr['locale'] = DataValidator::validate_string($dataAr['locale']);
         $dataAr['job_id'] = DataValidator::is_uinteger($dataAr['job_id']);
+        $dataAr['training_id'] = DataValidator::is_uinteger($dataAr['training_id']);
         $dataAr['comment_text'] = DataValidator::validate_string($dataAr['comment_text']);
         $dataAr['c_latitude'] = DataValidator::validate_string($dataAr['c_latitude']);
         $dataAr['c_longitude'] = DataValidator::validate_string($dataAr['c_longitude']);
