@@ -18,7 +18,7 @@
         <link rel="stylesheet" href="api.css" type="text/css" media="screen">
         
 
-        <script type="text/javascript" src="http://openlabor.lynxlab.com/include/PHPjavascript.php"></script><script type="text/javascript" src="http://openlabor.lynxlab.com/external/lib/js/prototype-1.6.0.1.js"></script>
+
 <noscript>Questo browser non supporta Javascript</noscript>
 <script type="text/javascript" src="http://openlabor.lynxlab.com/external/lib/js/scriptaculous/scriptaculous.js"></script>
 <noscript>Questo browser non supporta Javascript</noscript>
@@ -27,8 +27,11 @@
 <script type="text/javascript" src="http://openlabor.lynxlab.com/js/include/chkfrm.js"></script>
 <noscript>Questo browser non supporta Javascript</noscript>
 
+<!--for syntax highlight-->
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://balupton.github.com/jquery-syntaxhighlighter/scripts/jquery.syntaxhighlighter.min.js"></script>
+<script type="text/javascript">$.SyntaxHighlighter.init();</script>
 <title>OpenLabor API specification</title>
-
 </head>
 <body>
 
@@ -90,23 +93,15 @@ Applications submitting jobs/training offers or submitting comments will need AP
 <p>UTF-8 is required everywhere. API supports both XML and JSON.</p>
 <h3>Language support</h3>
 The language specification is forseen (the locale variable accept the format: en_US, it_IT)
-<h2 class="testh2">
+<h2 class="test">
 <a name="methods">
    API methods 
 </a>
 </p>    
 </h2>
-<p>OpenLabor provides RESTFul API methods according to <strong>international&#160;</strong><strong>standard&#160;</strong><strong><a href="http://open311.org/" target="_blank">Open311</a>:</strong></p>
-<ul>
-    <li>Check out the service (discovery):&#160;<a href="../doc_news/discovery.xml" target="_blank">XML</a>&#160;o&#160;<a href="../discovery.json" target="_blank">JSON</a></li>
-    <li>Check out the services (services):&#160;<a href="../doc_news/services.xml" target="_blank">XML</a>&#160;o&#160;<a href="../services.json" target="_blank">JSON</a></li>
-    <li>Check out the details of JOBS search service:&#160;<a href="../services/001.xml" target="_blank">XML</a>&#160;o&#160;<a href="../services/001.json" target="_blank">JSON</a></li>
-    <li>Check out the details of the reporting job service:&#160;<a href="../services/002.xml" target="_blank">XML</a>&#160;o&#160;<a href="../services/002.json" target="_blank">JSON</a></li>
-    <li>Check out the details of&#160;the training opportunities search service:&#160;<a href="../services/005.xml" target="_blank">XML</a>&#160;o&#160;<a href="../services/005.json" target="_blank">JSON</a></li>
-    <li>Check out the details of the reporting training opportinities service:&#160;<a href="../services/006.xml" target="_blank">XML</a>&#160;o&#160;<a href="../services/006.json" target="_blank">JSON</a></li>
-</ul>
-<p>&#160;</p>
-<p><a href="api/v1/services/006.json" target="_blank">&#160;</a></p>
+
+
+
 
                 </div>
             </div>
@@ -120,6 +115,31 @@ The language specification is forseen (the locale variable accept the format: en
                         <li>
                             <a href="#methods">API methods</a>
                         </li>
+                       
+                       <ul class="internalink">
+                        <li>
+                            <a href="#serviceList">Get service list</a>
+                        </li>
+                          <li>
+                            <a href="#serviceDefinition">Get service definition</a>
+                        </li>
+                         <li>
+                            <a href="#jobsSearch">Get JOBS search service</a>
+                        </li>
+                        <li>
+                            <a href="#reportingJob">Report job service</a>
+                        </li>
+                        <li>
+                            <a href="#commentJob">Post comment job service</a>
+                         </li>  
+                        
+                         <li>
+                              <a href="#opportunities">Get training opportunities search service</a>
+                          </li>  
+                          <li>
+                               <a href="#reportingTraininig">Report traininig service</a>
+                          </li>
+                        </ul>   
                     </ul>
                 
 		</div>
@@ -129,8 +149,1605 @@ The language specification is forseen (the locale variable accept the format: en
 <br class="clearfix">
 </div>
 <div id="bottomcont"></div>
+<h2 class="testH2">
+<a name="serviceList">
+<h1></p>Get service list</h1></p><br>
+</a>
+</h2>
+Provides a list of acceptable service request types and their associated service codes.
+<ul>
+<li>URL address:  http://devopenlabor.lynxlab.com/api/v1/services[format]</li>
+<li>Example URL: http://devopenlabor.lynxlab.com/api/v1/services.json</li>
+<li>Requires API key: No</li>
+<li>Method: GET</li>
+</ul><br>
+<p><strong>Request parameter</strong></p><br>
+<table class="imagetable">
+    <th>Parameter name</th>
+    <th>Description</th>
+    <th>Required</th>
+    <th>Notes</th>
+    <tr>
+        <td><strong>locale</strong></td>
+        <td>Preferred language</td>
+        <td>No</td>
+        <td>At moment locale is not implemented</td>
+        
+    </tr>
+    </table>
+<p><strong>Response parameter</strong></p><br>
+<table class="imagetable">
+    <th>Parameter name</th>
+    <th>Description</th>
+    <th>Required</th>
+    <th>Notes</th>
+    <tr>
+        <td><strong>service_code</strong></td>
+        <td>The unique identifier for the service request type.</td>
+        <td>Yes</td>
+        <td>The service_code is specified in the main URL path rather than an added query string parameter.</td>
+        
+    </tr>
+      <tr>
+        <td><strong>service_name</strong></td>
+        <td>The human readable name of the service request type</td>
+        <td>Yes</td>
+        <td></td>
+        
+    </tr>
+          <tr>
+        <td><strong>description</strong></td>
+        <td>A brief description of the service request type.</td>
+        <td>Yes</td>
+        <td></td>
+        
+    </tr>
+      </tr>
+          <tr>
+              
+        <td><strong>metadata</strong></td>
+        <td>Determines whether their are additional form fields for this service type.
+
+<li>true: This service request type requires additional metadata so the client will need to make a call to the <a  href="http://wiki.open311.org/GeoReport_v2.1_Draft#GET_Service_Definition">Service Definition</a> method.</li>
+<li>false: No additional information is required and a call to the <a class="link" href="http://wiki.open311.org/GeoReport_v2.1_Draft#GET_Service_Definition">Service Definition</a> method is not needed.</li></td>
+        <td>Yes</td>
+        <td>At the moment metadata is always set to false.</td>
+        
+    </tr>
+      <tr>
+        <td><strong>type</strong></td>
+        <td>realtime: The service request ID will be returned immediately after the service request is submitted.</td>
+        <td>Yes</td>
+        <td>At the moment, type is always set to realtime.</td>
+        
+    </tr>
+       <tr>
+        <td><strong>keywords</strong></td>
+        <td>A comma separated list of tags or keywords to help users identify the request type. This can provide synonyms of the service_name and group.</td>
+        <td>Yes</td>
+        <td></td>
+        
+    </tr>
+      </tr>
+       <tr>
+        <td><strong>group</strong></td>
+        <td>A category to group this service type within. This provides a way to group several service request types under one category such as "sanitation"</td>
+        <td>Yes</td>
+        <td></td>
+        
+    </tr>
+    </table>
+
+<p><strong>Possible errors</strong></p>
+The numbers represent the HTTP status code returned for each error type:
+<ul>
+<li>400 - General Service Error (Any failure during create request processing, eg CRM is down. Client will need to notify us)</li>
+</ul>
+<p><strong>Example request:</strong></p>
+<a class="link"href="http://devopenlabor.lynxlab.com/api/v1/services.json">http://devopenlabor.lynxlab.com/api/v1/services.json</a>
+<p><strong>Example response:</strong></p>
+
+<pre class="highlight">    
+    <strong>service: </strong>[
+{
+service_code: "001",
+service_name:"search_jobs",
+description: "jobs find",
+metadata: "true",
+type: "realtime",
+keywords: "retrives single job, retrives list of jobs ",
+group: "training and job"
+},
+{
+service_code:"002",
+service_name:"job_reports",
+description: "reports jobs",
+metadata:"true",
+type: "realtime",
+keywords: {},
+group: "training and job"
+},
+</pre><br>
+<h2 class="testH2">
+<a name="serviceDefinition">
+<p><h1>Get service definition</h1></p><br>
+</a>
+</h2>
+Define attributes associated with a service code.
+<ul>
+<li>URL address:  http://devopenlabor.lynxlab.com/api/v1/services/[service code].[format]</li>
+<li>Example URL: http://devopenlabor.lynxlab.com/api/v1/services/002.json</li>
+
+<li>Requires API key: No</li>
+<li>Method: GET</li>
+</ul><br>
+<p><strong>Request parameter</strong></p><br>
+<table class="imagetable">
+     <th>Parameter name</th>
+    <th>Description</th>
+    <th>Required</th>
+    <th>Notes</th>
+       <tr>
+        <td><strong>service_code</strong></td>
+        <td>The unique identifier for the service request type.</td>
+        <td>Yes</td>
+        <td>The service_code is specified in the main URL path rather than an added query string parameter.</td>
+        
+    </tr>
+ </table>
+<p><strong>Possible errors</strong></p>
+The numbers represent the HTTP status code returned for each error type:
+<ul>
+<li>400 - General Service Error (Any failure during create request processing, eg CRM is down. Client will need to notify us)</li>
+<li>404 - service_code or jurisdiction_id was not found (specified in error response)</li>
+</ul>
+<p><strong>Example request:</strong></p>
+<a class="link"href="http://devopenlabor.lynxlab.com/api/v1/services/002.json">http://devopenlabor.lynxlab.com/api/v1/services/002.json</a>
+<p><strong>Example response:</strong></p>
+
+<pre class="highlight">
+{
+service_code: "002",
+http_method: "POST",
+attributes: {
+attribute: [
+{
+variable: "true",
+code: "api_key",
+datatype: "string",
+required: "true",
+datatype_description: { },
+order: "1",
+description: "api key"
+},
+{
+variable: "true",
+code: "jurisdiction_id ",
+datatype: "string",
+required: "false",
+datatype_description: "This is only required if the endpoint serves multiple jurisdictions",
+order: "1",
+description: "jurisdiction id"
+},
+{
+variable: "true",
+code: "locale",
+datatype: "string",
+required: "false",
+datatype_description: "Choose of preferred language",
+order: "1",
+description: "language in format en_US, it_IT,"
+},
+</pre><br>
+<h2 class="testH2">
+<a name="jobsSearch">
+<p><h1>Get JOBS search</h1></p><br>
+</a>
+</h2>
+Provides a list of jobs offers.
+<ul>
+<li>URL address:  http://devopenlabor.lynxlab.com/api/v1/requests[format]</li>
+<li>Example URL: http://devopenlabor.lynxlab.com/api/v1/requests.json?service_code=001</li>
+<li>Requires API key: No</li>
+<li>Method: GET</li>
+</ul><br>
+<p><strong>Request parameter</strong></p><br>
+<table class="imagetable">
+    <th>Parameter name</th>
+    <th>Description</th>
+    <th>Required</th>
+    <th>Notes</th>
+   <tr>
+        <td><strong>service_code</strong></td>
+        <td>The unique identifier for the service request type.</td>
+        <td>Yes</td>
+        <td>001</td>
+        
+    </tr>
+      <tr>
+        <td><strong>jurisdiction_id</strong></td>
+        <td>jurisdiction_id is only required if the endpoint serves multiple jurisdictions</td>
+        <td>No</td>
+        <td></td>
+        
+    </tr>
+    <tr>
+        <td><strong>locale</strong></td>
+        <td>Preferred language</td>
+        <td>No</td>
+        <td>language in format en_US, it_IT</td>
+        
+    </tr>
+      <tr>
+        <td><strong>keywords</strong></td>
+        <td>keywords separated by comas</td>
+        <td>No</td>
+        <td>keywords to find a job</td>
+        
+    </tr>
+       <tr>
+        <td><strong>city</strong></td>
+        <td>City in which looking for job</td>
+        <td>No</td>
+        <td></td>
+        
+    </tr>
+      </tr>
+       <tr>
+        <td><strong>qualification</strong></td>
+        <td>educational qualification of the candidate</td>
+        <td>No</td>
+        <td></td>
+        
+    </tr>
+    </table>
+<p><strong>Response parameter</strong></p><br>
+<table class="imagetable">
+    <th>Parameter name</th>
+    <th>Description</th>
+    <th>Required</th>
+    <th>Notes</th>
+    <tr>
+       <td><strong>idJobOffers</strong></td>
+        <td>unique identifier of a job offers </td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+     <tr>
+       <td><strong>idJobOriginal</strong></td>
+        <td>original unique identifier of a job offers </td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+     <tr>
+       <td><strong>jobExpiration</strong></td>
+        <td>deadline (in unixtime) to submit the application</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+     <tr>
+       <td><strong>workersRequired</strong></td>
+        <td>number of works required</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+      <tr>
+       <td><strong>professionalProfile</strong></td>
+        <td>professional profile required</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+       <tr>
+       <td><strong>professionalProfile</strong></td>
+        <td>professional profile required</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+       </tr>
+       <tr>
+       <td><strong>positionCode</strong></td>
+        <td>National Professional Code according with international professional code (ISCO-08)</td>
+        <td>Yes</td>
+        <td>get the value from national professional code system (ex: in Italy from ISTAT: http://cp2011.istat.it/)</td>  
+    </tr>
+       <tr>
+       <td><strong>position</strong></td>
+        <td>position</td>
+        <td>Yes</td>
+        <td></td>  
+    
+          <tr>
+       <td><strong>qualificationRequired</strong></td>
+        <td>educational qualification of the candidate</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+   
+      <tr>
+       <td><strong>descriptionQualificationRequired</strong></td>
+        <td>description of competences of educational qualification of the candidate</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+     <tr>
+       <td><strong>professionalTrainingRequired</strong></td>
+        <td>professional Training Required</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+       <tr>
+       <td><strong>cityCompany</strong></td>
+        <td>City in which is based the company hiring</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+         <tr>
+       <td><strong>idCPI</strong></td>
+        <td>identifying employment center</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+        <tr>
+       <td><strong>experienceRequired</strong></td>
+        <td>Experience required by the company</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+      <tr>
+       <td><strong>durationExperience</strong></td>
+        <td>how many year of experience the company requires</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+          <tr>
+       <td><strong>minAge</strong></td>
+        <td>minimum age required</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+          <tr>
+       <td><strong>maxAge</strong></td>
+        <td>maximum age required</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+            <tr>
+       <td><strong>remuneration</strong></td>
+        <td>remuneration offered by the company</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+           <tr>
+       <td><strong>rewards</strong></td>
+        <td>rewards offered by the company</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+         <tr>
+       <td><strong>reservedForDisabled</strong></td>
+        <td>whether the job is reserved to disable people</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+        <tr>
+       <td><strong>favoredCategoryRequests</strong></td>
+        <td>to which kind of disabilities are reserved job (only if reserved for disabled is true)</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+         <tr>
+       <td><strong>ownVehicle</strong></td>
+        <td>whether the hiring candidate has to have a own vehicle</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+       <tr>
+       <td><strong>notes</strong></td>
+        <td>notes</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+       <tr>
+       <td><strong>linkMoreInfo</strong></td>
+        <td>URL to more info about job offer</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+    <tr>
+       <td><strong>dateInsert</strong></td>
+        <td>insertion date</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+    <tr>
+       <td><strong>sourceJob</strong></td>
+        <td>email address of the person who report the job offer or his/her id</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+        <tr>
+       <td><strong>j_latitude</strong></td>
+        <td>Latitude using the (WGS84) projection.</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+        <tr>
+       <td><strong>j_longitude</strong></td>
+        <td>Longitude using the (WGS84) projection.</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+          <tr>
+       <td><strong>contractType</strong></td>
+        <td>Type of contract</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+          <tr>
+       <td><strong>j_address</strong></td>
+        <td>Human entered address or location</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+             <tr>
+       <td><strong>zipCode</strong></td>
+        <td>Human entered zip code (CAP in Italy)</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+            <tr>
+       <td><strong>nation</strong></td>
+        <td>The nation in which is based the company hiring</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+              <tr>
+       <td><strong>media_url</strong></td>
+        <td>URL to media</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+           <tr>
+       <td><strong>locale</strong></td>
+        <td>language</td>
+        <td>Yes</td>
+        <td>language in format en_US, it_IT</td>  
+    </tr>
+         <tr>
+       <td><strong>sourceJobName</strong></td>
+        <td>first name of the person who report the job offer or his/her id</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+          <tr>
+       <td><strong>sourceJobSurname</strong></td>
+        <td>last name of the person who report the job offer or his/her id</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+          <tr>
+       <td><strong>published</strong></td>
+        <td>whether job offer is published</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+              <tr>
+       <td><strong>j_idNode</strong></td>
+        <td>id of relative node</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+             <tr>
+       <td><strong>CPICod</strong></td>
+        <td>code of employment center</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+              <tr>
+       <td><strong>nameCPI</strong></td>
+        <td>name of employment center</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+               <tr>
+       <td><strong>address</strong></td>
+        <td>address of employment center</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+            <tr>
+       <td><strong>CAP</strong></td>
+        <td>zip code of employment center</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+                <tr>
+       <td><strong>city</strong></td>
+        <td>city of employment center</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+              <tr>
+       <td><strong>CPIzone</strong></td>
+        <td>zone of employment center</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+               <tr>
+       <td><strong>phone</strong></td>
+        <td>phone of employment center</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+              <tr>
+       <td><strong>fax</strong></td>
+        <td>fax of employment center</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+             <tr>
+       <td><strong>email</strong></td>
+        <td>email of employment center</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+            <tr>
+       <td><strong>latitude</strong></td>
+        <td>latitude of employment center</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+    
+           <tr>
+       <td><strong>longitude</strong></td>
+        <td>longitude of employment center</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+         <tr>
+       <td><strong>source</strong></td>
+        <td>source of employment center</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+    
+
+    </table>
+
+ <p><strong>Possible errors</strong></p>
+The numbers represent the HTTP status code returned for each error type:
+<ul>
+<li>400 - General Service Error (Any failure during create request processing, eg CRM is down. Client will need to notify us)</li>
+<li>404 - service_code or jurisdiction_id was not found (specified in error response)</li>
+</ul>
+<p><strong>Example request:</strong></p>
+<a class="link"href="http://devopenlabor.lynxlab.com/api/v1/requests.json?service_code=001">http://devopenlabor.lynxlab.com/api/v1/requests.json?service_code=001</a>
+<p><strong>Example response:</strong></p>
+<pre class="highlight">    
+{
+idJobOffers: "25",
+idJobOriginal: "3481",
+jobExpiration: "1392850800",
+workersRequired: "1",
+professionalProfile: "AIUTO COMMESSO DI LIBRERIA",
+positionCode: "5.1.2.2.0.5",
+position: "AIUTO COMMESSO",
+qualificationRequired: "ISTITUTO PROFESSIONALE (SECONDO CICLO) - SCUOLA MAGISTRALE (5 ANNI) - ISTITUTO TECNICO - ISTITUTO MAGISTRALE (4 E 5 ANNI) - LICEI SCIENTIFICO, CLASSICO, LINGUISTICO - ISTITUTO D'ARTE (SECONDO CICLO) - LICEO ARTISTICO (4 E 5 ANNI) - ISTITUTO SUPERIORE",
+descriptionQualificationRequired: "DIPLOMA DI ISTRUZIONE SECONDARIA SUPERIORE CHE PERMETTE L'ACCESSO ALL'UNIVERSITA'",
+professionalTrainingRequired: "",
+cityCompany: "VALMONTONE",
+idCPI: "17",
+experienceRequired: "DISCRETA CONOSCENZA DEL PRODOTTO LIBRO",
+durationExperience: "0",
+minAge: "0",
+maxAge: "0",
+remuneration: "0",
+rewards: "-",
+reservedForDisabled: "SI",
+favoredCategoryRequests: "ARTICOLO 1 LEGGE 68/99",
+ownVehicle: "-",
+notes: "CONTRATTO DI LAVORO PART-TIME CON TURNI DIURNI E FESTIVI DALLE ORE 10.00 ALLE 20.30. INDISPENSABILE: DIPLOMA DI SCUOLA MEDIA SUPERIORE, BUONA CONOSCENZA OFFICE , DISCRETA CONOSCENZA DEL PRODOTTO LIBRO, PRESENTARE CURRICULUM VITAE AL MOMENTO DELL'AUTOCANDIDATURA. PREFERIBILE: ETA' 21-40 ANNI, BUONA CONOSCENZA LINGUA INGLESE, ESPERIENZA DI VENDITA AL PUBBLICO, PATENTE DI GUIDA CAT. A.",
+linkMoreInfo: "http://co.provincia.roma.it/ido/Offerta.aspx?idOfferta=3481&Pubblica=1",
+dateInsert: "1391794370",
+sourceJob: "http://co.provincia.roma.it/ido/XmlOpenData/Preselezioni.xml",
+j_latitude: "",
+j_longitude: "",
+contractType: "",
+j_address: "",
+zipCode: "",
+nation: "",
+media_url: "",
+locale: "",
+sourceJobName: "",
+sourceJobSurname: "",
+published: "0",
+j_idNode: "1_25",
+CPICod: "COLLEFERRO",
+nameCPI: "Centro per l'Impiego Colleferro",
+address: "Via Carpinetana Sud, 144 ",
+CAP: "00034",
+city: "Colleferro",
+CPIzone: "Artena, Carpineto Romano, Colleferro, Gavignano, Gorga, Labico, Montelanico, Segni, Valmontone",
+phone: "06.97235000 ",
+fax: "06.97236327",
+email: "impiego.colleferro@provincia.roma.it",
+latitude: "41.723812",
+longitude: "13.011224",
+source: ""
+},
+</pre><br>
+
+<h2 class="testH2">
+<a name="reportingJob">
+<p><h1>Post reporting job service</h1></p><br>
+</a>
+</h2>
+This method is used for sending a job report.
+<ul>
+<li>URL address:  http://devopenlabor.lynxlab.com/api/v1/services[format]</li>
+<li>Example URL: http://devopenlabor.lynxlab.com/api/v1/services.json</li>
+<li>Posting formats: Content-Type application/x-www-form-urlencoded or multipart/form-data</li>
+<li>Requires API key: Yes</li>
+<li>Method: POST</li>
+</ul><br>
+<p><strong>Request parameter</strong></p><br>
+<table class="imagetable">
+    <th>Parameter name</th>
+    <th>Description</th>
+    <th>Required</th>
+    <th>Notes</th>
+       <tr>
+        <td><strong>service_code</strong></td>
+        <td>The unique identifier for the service request type.</td>
+        <td>Yes</td>
+        <td>002</td>
+        
+    </tr>
+           <tr>
+        <td><strong>api_key</strong></td>
+        <td>The unique identifier for the service request type.</td>
+        <td>Yes</td>
+        <td>api_key</td>
+        
+    </tr>
+      <tr>
+        <td><strong>jurisdiction_id</strong></td>
+        <td>jurisdiction_id is only required if the endpoint serves multiple jurisdictions</td>
+        <td>No</td>
+        <td></td>
+        
+    </tr>
+     <tr>
+        <td><strong>locale</strong></td>
+        <td>Preferred language</td>
+        <td>No</td>
+        <td>language in format en_US, it_IT</td>
+        
+    </tr>
+      <tr>
+       <td><strong>professionalProfile</strong></td>
+        <td>professional profile required</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+      <tr>
+       <td><strong>positionCode</strong></td>
+        <td>National Professional Code according with international professional code (ISCO-08)</td>
+        <td>Yes</td>
+        <td>National Professional Code according with international professional code (ISCO-08)</td>  
+    </tr>
+    <tr>
+       <td><strong>position</strong></td>
+        <td>position</td>
+        <td>Yes</td>
+        <td></td>  
+   <tr>
+                  <tr>
+       <td><strong>contractType</strong></td>
+        <td>Type of contract</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+     <tr>
+       <td><strong>workersRequired</strong></td>
+        <td>number of works required</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+     <tr>
+       <td><strong>jobExpiration</strong></td>
+        <td>deadline (in unixtime) to submit the application</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+
+       <tr>
+       <td><strong>descriptionQualificationRequired</strong></td>
+        <td>description of competences of educational qualification of the candidate</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+     <tr>
+       <td><strong>professionalTrainingRequired</strong></td>
+        <td>professional Training Required</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+      <tr>
+       <td><strong>address</strong></td>
+        <td>Human entered address or location</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+           <tr>
+       <td><strong>zipCode</strong></td>
+        <td>Human entered zip code (CAP in Italy)</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+    <tr>
+       <td><strong>cityCompany</strong></td>
+        <td>City in which is based the company hiring</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+          <tr>
+       <td><strong>nation</strong></td>
+        <td>The nation in which is based the company hiring</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+       <tr>
+       <td><strong>experienceRequired</strong></td>
+        <td>Experience required by the company</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+    <tr>
+       <td><strong>durationExperience</strong></td>
+        <td>how many year of experience the company requires</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+        <tr>
+       <td><strong>minAge</strong></td>
+        <td>minimum age required</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+        <tr>
+       <td><strong>maxAge</strong></td>
+        <td>maximum age required</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+         <tr>
+       <td><strong>remuneration</strong></td>
+        <td>remuneration offered by the company</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+             <tr>
+       <td><strong>rewards</strong></td>
+        <td>rewards offered by the company</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+             <tr>
+       <td><strong>reservedForDisabled</strong></td>
+        <td>whether the job is reserved to disable people</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+       <tr>
+       <td><strong>favoredCategoryRequests</strong></td>
+        <td>to which kind of disabilities are reserved job (only if reserved for disabled is true)</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+            <tr>
+       <td><strong>ownVehicle</strong></td>
+        <td>whether the hiring candidate has to have a own vehicle</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+    <tr>
+       <td><strong>notes</strong></td>
+        <td>notes</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+       <tr>
+       <td><strong>linkMoreInfo</strong></td>
+        <td>URL to more info about job offer</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+      <tr>
+       <td><strong>j_latitude</strong></td>
+        <td>Latitude using the (WGS84) projection.</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+        <tr>
+       <td><strong>j_longitude</strong></td>
+        <td>Longitude using the (WGS84) projection.</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+     <tr>
+       <td><strong>sourceJob</strong></td>
+        <td>email address of the person who report the job offer or his/her id</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+          <tr>
+       <td><strong>sourceJobName</strong></td>
+        <td>first name of the person who report the job offer or his/her id</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+          <tr>
+       <td><strong>sourceJobSurname</strong></td>
+        <td>last name of the person who report the job offer or his/her id</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+    
+              <tr>
+       <td><strong>media_url</strong></td>
+        <td>URL to media</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+         <tr>
+       <td><strong>published</strong></td>
+        <td>whether job offer is published</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+</table>
+<p><strong>Response parameter</strong></p><br>
+<table class="imagetable">
+     <th>Parameter name</th>
+    <th>Description</th>
+    <th>Required</th>
+    <th>Notes</th>
+    <tr>
+        <td><strong>AddedJobId</strong></td>
+        <td>job id returned</td>
+        <td>Yes</td>
+        <td></td>
+        
+    </tr>
+    
+ </table>   
+<p><strong>Possible errors</strong></p>
+The numbers represent the HTTP status code returned for each error type:
+<ul>
+<li>400 - General Service Error (Any failure during create request processing, eg CRM is down. Client will need to notify us)</li>
+<li>404 - service_code or jurisdiction_id was not found (specified in error response)</li>
+</ul>
+
+<p><strong>Example request:</strong></p>
+<pre class="language-html">    
+POST /api/v1/requests.json
+Host: openlabor.lynxlab.com
+Content-Type: application/x-www-form-urlencoded; charset=utf-8
+
+service_code=002
+</pre> 
+<p><strong>Example response:</strong></p>
+<pre class="highlight">    
+{
+AddedJobId: "62"
+}
+</pre> <br>
+<h2 class="testH2">
+<a name="commentJob">
+<p><h1>Post  comment job service</h1></p><br>
+</a>
+</h2>
+This method is used for sending comments of jobs offers.
+<ul>
+<li>URL address:  http://devopenlabor.lynxlab.com/api/v1/services[format]</li>
+<li>Example URL: http://devopenlabor.lynxlab.com/api/v1/services.json</li>
+<li>Posting formats: Content-Type application/x-www-form-urlencoded or multipart/form-data</li>
+<li>Requires API key: Yes</li>
+<li>Method: POST</li>
+</ul><br>
+<p><strong>Request parameter</strong></p><br>
+<table class="imagetable">
+    <th>Parameter name</th>
+    <th>Description</th>
+    <th>Required</th>
+    <th>Notes</th>
+        <tr>
+        <td><strong>service_code</strong></td>
+        <td>The unique identifier for the service request type.</td>
+        <td>Yes</td>
+        <td>003</td>
+        
+    </tr>
+         <tr>
+        <td><strong>api_key</strong></td>
+        <td>The unique identifier for the service request type.</td>
+        <td>Yes</td>
+        <td>api_key</td>
+        
+    </tr>
+    
+      <tr>
+        <td><strong>jurisdiction_id</strong></td>
+        <td>jurisdiction_id is only required if the endpoint serves multiple jurisdictions</td>
+        <td>Yes</td>
+        <td></td>
+        
+    </tr>
+    <tr>
+        <td><strong>locale</strong></td>
+        <td>Preferred language</td>
+        <td>No</td>
+        <td>language in format en_US, it_IT</td>
+        
+    </tr>
+     <tr>
+        <td><strong>job_id</strong></td>
+        <td>Id of the job to be commented</td>
+        <td>Yes</td>
+        <td></td>
+        
+    </tr>
+         <tr>
+        <td><strong>comment_text</strong></td>
+        <td>IThe text of the comment</td>
+        <td>Yes</td>
+        <td></td>
+        
+    </tr>
+           <tr>
+        <td><strong>c_latitude</strong></td>
+        <td>Latitude using the (WGS84) projection.</td>
+        <td>No</td>
+        <td></td>
+        
+    </tr>
+         <tr>
+        <td><strong>c_longitude</strong></td>
+        <td>Longitude using the (WGS84) projection.</td>
+        <td>No</td>
+        <td></td>
+        
+    </tr>
+     <tr>
+        <td><strong>c_user</strong></td>
+        <td>email address of the person who comment the job offer or his/her id</td>
+        <td>Yes</td>
+        <td></td>
+        
+    </tr>
+       <tr>
+        <td><strong>c_user_firstname</strong></td>
+        <td>first name of the person who comment the job offer</td>
+        <td>No</td>
+        <td></td>
+        
+    </tr>
+      <tr>
+        <td><strong>c_user_surname</strong></td>
+        <td>last name of the person who comment the job offer</td>
+        <td>No</td>
+        <td></td>
+        
+    </tr>
+      <tr>
+        <td><strong>c_published</strong></td>
+        <td>whether the comment is published</td>
+        <td>No</td>
+        <td></td>
+        
+    </tr>
+    
+</table>
+<p><strong>Response parameter</strong></p><br>
+<table class="imagetable">
+    <th>Parameter name</th>
+    <th>Description</th>
+    <th>Required</th>
+    <th>Notes</th>
+    <tr>
+       <td><strong>AddedCommentToJobId</strong></td>
+        <td>comment id returned</td>
+        <td>Yes</td>
+        <td></td> 
+    </tr>
+ </table>
+
+<p><strong>Possible errors</strong></p>
+The numbers represent the HTTP status code returned for each error type:
+<ul>
+<li>400 - General Service Error (Any failure during create request processing, eg CRM is down. Client will need to notify us)</li>
+<li>404 - service_code or jurisdiction_id was not found (specified in error response)</li>
+</ul>
+
+<p><strong>Example request:</strong></p>
+<pre class="language-html">    
+POST /api/v1/requests.json
+Host: penlabor.lynxlab.com
+Content-Type: application/x-www-form-urlencoded; charset=utf-8
+
+service_code=003
+</pre> 
+<p><strong>Example response:</strong></p>
+<pre class="highlight"> 
+{
+AddedCommentToJobId: "1_71"
+}
+</pre><br>
+<h2 class="testH2">
+<a name="opportunities">
+<p><h1>Get  opportunities search service</h1></p><br>
+</a>
+</h2>
+Get details of the training opportunities 
+<ul>
+<li>URL address:  http://devopenlabor.lynxlab.com/api/v1/requests[format]</li>
+<li>Example URL: http://devopenlabor.lynxlab.com/api/v1/requests.json?service_code=005</li>
+<li>Requires API key: No</li>
+<li>Method: GET</li>
+</ul><br>
+<p><strong>Request parameter</strong></p><br>
+<table class="imagetable">
+    <th>Parameter name</th>
+    <th>Description</th>
+    <th>Required</th>
+    <th>Notes</th>
+       <tr>
+        <td><strong>service_code</strong></td>
+        <td>The unique identifier for the service request type.</td>
+        <td>Yes</td>
+        <td>005</td>
+        
+    </tr>
+        <tr>
+        <td><strong>jurisdiction_id</strong></td>
+        <td>jurisdiction_id is only required if the endpoint serves multiple jurisdictions</td>
+        <td>No</td>
+        <td></td>
+        
+    </tr>
+      <tr>
+        <td><strong>locale</strong></td>
+        <td>Preferred language</td>
+        <td>No</td>
+        <td>language in format en_US, it_IT</td>
+        
+    </tr>
+      <tr>
+        <td><strong>keywords</strong></td>
+        <td>A comma separated list of tags or keywords to help users identify the request type. This can provide synonyms of the service_name and group.</td>
+        <td>No</td>
+        <td>keywords to find a course/training</td>
+        
+    </tr>
+         <tr>
+        <td><strong>city</strong></td>
+        <td>City in which looking for trainings</td>
+        <td>No</td>
+        <td></td>
+        
+    </tr>
+      <tr>
+        <td><strong>qualification</strong></td>
+        <td>educational qualification of the candidate</td>
+        <td>No</td>
+        <td></td>
+        
+    </tr>
+</table>
+<p><strong>Response parameter</strong></p><br>
+<table class="imagetable">
+    <th>Parameter name</th>
+    <th>Description</th>
+    <th>Required</th>
+    <th>Notes</th>
+    
+       <tr>
+        <td><strong>idTraining</strong></td>
+        <td>unique identifier of a training</td>
+        <td>Yes</td>
+        <td></td>
+        
+    </tr>  
+      <tr>
+        <td><strong>IdTrainingOriginal</strong></td>
+        <td>original unique identifier of a training</td>
+        <td>Yes</td>
+        <td></td>
+        
+    </tr> 
+        <tr>
+        <td><strong> nameTraining</strong></td>
+        <td>name of a training</td>
+        <td>Yes</td>
+        <td></td>
+        
+    </tr>  
+       <tr>
+        <td><strong> trainingCode</strong></td>
+        <td>code of a training</td>
+        <td>Yes</td>
+        <td></td>
+        
+    </tr> 
+     <tr>
+        <td><strong> company</strong></td>
+        <td>the name of the company delivering the training</td>
+        <td>Yes</td>
+        <td></td>
+       
+    </tr> 
+      <tr>
+        <td><strong>trainingAddress</strong></td>
+        <td>address where the course takes place</td>
+        <td>Yes</td>
+        <td></td>
+        
+    </tr> 
+         <tr>
+       <td><strong>zipCode</strong></td>
+        <td>Human entered zip code (CAP in Italy)</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+    <tr>
+        <td><strong>city</strong></td>
+        <td>City where the course takes place</td>
+        <td>No</td>
+        <td></td>
+        
+    </tr>
+           <tr>
+       <td><strong>phone</strong></td>
+        <td>contact of the company that delivers the training (email, phone, web site)</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+        <tr>
+       <td><strong>durationHours</strong></td>
+        <td>Duration of the training in hours</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+         <tr>
+       <td><strong>trainingType</strong></td>
+        <td>training type </td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+      <tr>
+       <td><strong>t_userType</strong></td>
+        <td>the user type to whom the course is aimed </td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+         <tr>
+             <td><strong>t_qualificationRequired</strong></td>
+        <td>educational qualification of the candidate</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+       <tr>
+             <td><strong>t_longitude</strong></td>
+        <td>longitude using the (WGS84) projection.</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+       <tr>
+             <td><strong> t_latitude</strong></td>
+        <td>latitude using the (WGS84) projection</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+       <tr>
+             <td><strong> t_dateInsert</strong></td>
+        <td>insertion date of the training</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+    <tr>
+             <td><strong> hash</strong></td>
+        <td>hash code of the training</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+     <tr>
+             <td><strong>t_source</strong></td>
+        <td>email address of the person or his/her id</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+        <tr>
+             <td><strong>t_nation</strong></td>
+        <td>city where the course takes place</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+       <tr>
+             <td><strong> t_minAge</strong></td>
+        <td>minimum age required for the training</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+          <tr>
+             <td><strong>t_maxAge</strong></td>
+        <td>maximum age required for the training</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+          <tr>
+             <td><strong>t_price</strong></td>
+        <td>remuneration offered by the company</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+           <tr>
+             <td><strong>t_reservedForDisabled</strong></td>
+        <td>whether the training is reserved to disable people</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+        <tr>
+             <td><strong>t_favoredCategoryRequests</strong></td>
+        <td>to which kind of disabilities are reserved training</td>
+        <td>Yes</td>
+        <td>only if reserved for disabled is true</td>  
+    </tr>
+       <tr>
+             <td><strong>t_notes</strong></td>
+        <td>notes</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+     <tr>
+             <td><strong>t_expiration</strong></td>
+        <td>deadline (in unixtime) to submit the training</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+       <tr>
+             <td><strong>t_linkMoreInfo</strong></td>
+        <td>URL to more info about training offer</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+       <tr>
+             <td><strong>t_media_url</strong></td>
+        <td>URL to media</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+       <tr>
+        <td><strong>locale</strong></td>
+        <td>Preferred language</td>
+        <td>No</td>
+        <td>language in format en_US, it_IT</td>
+        
+    </tr>
+    <tr>
+             <td><strong>sourceTrainingName</strong></td>
+        <td>first name of the person who report the training offer or his/her id</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+          <tr>
+             <td><strong>sourceTrainingSurname</strong></td>
+        <td>last name of the person who report the training offer or his/her id</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+         <tr>
+             <td><strong>t_published</strong></td>
+        <td>whether training offer is published</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+         <tr>
+             <td><strong>t_idNode</strong></td>
+        <td>node of the training</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+
+</table>
+<p><strong>Possible errors</strong></p>
+The numbers represent the HTTP status code returned for each error type:
+<ul>
+<li>400 - General Service Error (Any failure during create request processing, eg CRM is down. Client will need to notify us)</li>
+<li>404 - service_code or jurisdiction_id was not found (specified in error response)</li>
+</ul>
+<p><strong>Example request:</strong></p>
+<a class="link"href="http://devopenlabor.lynxlab.com/api/v1/requests.json?service_code=001">http://devopenlabor.lynxlab.com/api/v1/requests.json?service_code=005</a>
+<p><strong>Example response:</strong></p>
+
+<pre class="highlight">
+CAP: "00174",
+city: "ROMA",
+phone: "06/7101749",
+durationHours: "1800",
+trainingType: "QUALIFICA",
+t_userType: null,
+t_qualificationRequired: null,
+t_longitude: null,
+t_latitude: null,
+t_dateInsert: "1392669989",
+hash: "",
+t_source: "",
+t_nation: null,
+t_minAge: null,
+t_maxAge: null,
+t_price: null,
+t_reservedForDisabled: "",
+t_favoredCategoryRequests: null,
+t_notes: null,
+t_expiration: "0",
+t_linkMoreInfo: null,
+t_media_url: "",
+t_locale: "",
+sourceTrainingName: "",
+sourceTrainingSurname: "",
+t_published: "0",
+t_idNode: "2_1"
+},
+</pre><br>
+<h2 class="testH2">
+<a name="reportingTraininig">
+<p><h1>Post reporting traininig service</h1></p><br>
+</a>
+</h2>    
+This method is used for sending a training report.
+<ul>
+<li>URL address:  http://devopenlabor.lynxlab.com/api/v1/services[format]</li>
+<li>Example URL: http://devopenlabor.lynxlab.com/api/v1/services.json</li>
+<li>Posting formats: Content-Type application/x-www-form-urlencoded or multipart/form-data</li>
+<li>Requires API key: Yes</li>
+<li>Method: POST</li>
+</ul><br>
+<p><strong>Request parameter</strong></p><br>
+<table class="imagetable">
+      <th>Parameter name</th>
+    <th>Description</th>
+    <th>Required</th>
+    <th>Notes</th>
+      <tr>
+        <td><strong>service_code</strong></td>
+        <td>The unique identifier for the service request type.</td>
+        <td>Yes</td>
+        <td>006</td>
+        
+    </tr>
+      <tr>
+        <td><strong>jurisdiction_id</strong></td>
+        <td>jurisdiction_id is only required if the endpoint serves multiple jurisdictions</td>
+        <td>No</td>
+        <td></td>
+        
+    </tr>
+       <tr>
+        <td><strong>locale</strong></td>
+        <td>Preferred language</td>
+        <td>No</td>
+        <td>language in format en_US, it_IT</td>
+        
+    </tr>
+         <tr>
+        <td><strong> nameTraining</strong></td>
+        <td>name of a training</td>
+        <td>Yes</td>
+        <td></td>
+        
+    </tr> 
+       <tr>
+        <td><strong> company</strong></td>
+        <td>the name of the company delivering the training</td>
+        <td>Yes</td>
+        <td></td>
+       
+    </tr> 
+          <tr>
+        <td><strong>trainingAddress</strong></td>
+        <td>address where the course takes place</td>
+        <td>No</td>
+        <td></td>
+        
+    </tr>
+         <tr>
+       <td><strong>CAP</strong></td>
+        <td>Human entered zip code (CAP in Italy)</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+      <tr>
+        <td><strong>city</strong></td>
+        <td>City where the course takes place</td>
+        <td>No</td>
+        <td></td>
+        
+    </tr>  
+       <tr>
+        <td><strong>nation</strong></td>
+        <td>City where the course takes place</td>
+        <td>No</td>
+        <td></td>
+        
+    </tr> 
+         <tr>
+       <td><strong>phone</strong></td>
+        <td>contact of the company that delivers the training (email, phone, web site)</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+      <tr>
+       <td><strong>durationHours</strong></td>
+        <td>Duration of the training in hours</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+        <tr>
+       <td><strong>trainingType</strong></td>
+        <td>training type </td>
+        <td>No</td>
+        <td>the value can be: qualification,specialization,or complete basic school</td>  
+    </tr>
+          <tr>
+       <td><strong>userType</strong></td>
+        <td>type of users target</td>
+        <td>No</td>
+        <td>the value can be: adult,underage,or migrant</td>  
+    </tr>
+        <tr>
+       <td><strong>qualificationRequired</strong></td>
+        <td>educational qualification of the candidate</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+   
+    <tr>
+       <td><strong>j_longitude</strong></td>
+        <td>Longitude using the (WGS84) projection.</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+      <tr>
+       <td><strong>latitude</strong></td>
+        <td>Latitude using the (WGS84) projection.</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+    <tr>
+             <td><strong>source</strong></td>
+        <td>email address of the person or his/her id</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+         <tr>
+       <td><strong>minAge</strong></td>
+        <td>minimum age required</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+          <tr>
+       <td><strong>maxAge</strong></td>
+        <td>maximum age required</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+      <tr>
+             <td><strong>price</strong></td>
+        <td>remuneration offered by the company</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+          <tr>
+       <td><strong>reservedForDisabled</strong></td>
+        <td>whether the job is reserved to disable people</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+            <tr>
+       <td><strong>favoredCategoryRequests</strong></td>
+        <td>to which kind of disabilities are reserved job (only if reserved for disabled is true)</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+         <tr>
+             <td><strong>expiration</strong></td>
+        <td>deadline (in unixtime) to submit the training</td>
+        <td>Yes</td>
+        <td></td>  
+    </tr>
+      <tr>
+       <td><strong>notes</strong></td>
+        <td>notes</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+     <tr>
+             <td><strong>t_linkMoreInfo</strong></td>
+        <td>URL to more info about training offer</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+                <tr>
+       <td><strong>media_url</strong></td>
+        <td>URL to media</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+     <tr>
+        <td><strong>locale</strong></td>
+        <td>Preferred language</td>
+        <td>No</td>
+        <td>language in format en_US, it_IT</td>
+        
+    </tr>
+      <tr>
+             <td><strong>sourceTrainingName</strong></td>
+        <td>first name of the person who report the training offer or his/her id</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+        <tr>
+             <td><strong>sourceTrainingSurname</strong></td>
+        <td>last name of the person who report the training offer or his/her id</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+       <tr>
+       <td><strong>published</strong></td>
+        <td>whether job offer is published</td>
+        <td>No</td>
+        <td></td>  
+    </tr>
+</table>
+<p><strong>Response parameter</strong></p><br>
+<table class="imagetable">
+     <th>Parameter name</th>
+    <th>Description</th>
+    <th>Required</th>
+    <th>Notes</th>
+    <tr>
+              <td><strong>AddedTrainingId</strong></td>
+        <td>Training id returned</td>
+        <td>Yes</td>
+        <td></td>
+        
+    </tr>
+ </table>
+ <p><strong>Possible errors</strong></p>
+The numbers represent the HTTP status code returned for each error type:
+<ul>
+<li>400 - General Service Error (Any failure during create request processing, eg CRM is down. Client will need to notify us)</li>
+<li>404 - service_code or jurisdiction_id was not found (specified in error response)</li>
+</ul>
+
+<p><strong>Example request:</strong></p>
+<pre class="language-html">    
+POST /api/v1/requests.json
+Host: penlabor.lynxlab.com
+Content-Type: application/x-www-form-urlencoded; charset=utf-8
+
+service_code=006
+</pre> 
+<p><strong>Example response:</strong></p>
+<pre class="highlight">    
+{
+AddedTrainingId: "2700"
+}
+</pre> 
 </div> <!--  / contenuto -->
-</div> 
+</div>
+
 <!-- / contenitore -->
 <!-- MENU A TENDINA -->
 <div id="mainmenu">
