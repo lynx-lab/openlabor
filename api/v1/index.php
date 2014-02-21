@@ -27,7 +27,9 @@ require_once(ROOT_DIR.'/include/ama.inc.php');
 require_once ROOT_DIR.'/include/multiport.inc.php';
 require_once ROOT_DIR.'/include/logger_class.inc.php';
 require_once ROOT_DIR.'/include/error_class.inc.php';
-require_once ROOT_DIR.'/include/user_classes.inc.php';/*
+require_once ROOT_DIR.'/include/user_classes.inc.php';
+
+/*
  * 
  * needed in order to have the initialization script phase working
  */

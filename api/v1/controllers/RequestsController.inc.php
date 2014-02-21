@@ -91,7 +91,7 @@ class RequestsController extends openLaborController {
         if (AMA_DB::isError($jobsData)) {
             $httpStatus = '400';
             $controller = new errorController();
-            $errorMsg = translateFN('Error reading Job id') . ' '.  $jobId;
+            $errorMsg = 'Error reading Job id' . ' '.  $jobId;
             $controller->printError('POST',$format,$errorMsg,$httpStatus);
         } else {
             $jobData = $jobsData[0];
@@ -120,6 +120,79 @@ class RequestsController extends openLaborController {
 
         }
         
+    }
+
+    /** *
+     * 
+     * comments search
+     * @param string $request
+     * @param string $format xml or json
+     * @return array $result
+     */
+    public function get004Action($request,$format='xml',$url_parameters) {
+        require_once(__DIR__ .'/../include/config.inc.php');
+        if (!isset($request['jobID'])) {
+            $httpStatus = '404';
+            $controller = new errorController();
+            $errorMsg = 'Job id malformed or null';
+            $controller->printError('GET',$format,$errorMsg,$httpStatus);
+        } else {
+            $jobResult = $this->getJob($request['jobID']);
+            $jobResult = $jobResult[0];
+            $this->LogRequest($_REQUEST,$_SERVER);
+            if(AMA_DB::isError($jobResult)) {
+                $httpStatus = '404';
+                $controller = new errorController();
+                $errorMsg = 'Error while reading Job id ' . $request['jobID'];
+                $controller->printError('GET',$format,$errorMsg,$httpStatus);
+            }
+            else {
+
+                $idNode = $jobResult['j_idNode'];
+                $positionCode = $jobResult['positionCode'];
+                $id_instance = ADA_JOB_INSTANCE_SERVICE_ID;
+                $nodeDataAr = $this->getComment($idNode, $id_instance);
+                if(AMA_DB::isError($nodeDataAr)) {
+                    $httpStatus = '404';
+                    $controller = new errorController();
+                    $errorMsg = 'Error while reading Comment ' . $idNode;
+                    $controller->printError('GET',$format,$errorMsg,$httpStatus);
+                }
+                else 
+                {
+                    $commentResult = array();
+                    for ($index = 0; $index < count($nodeDataAr); $index++) {
+                        $idLanguage = $nodeDataAr['lingua'];
+                        $commentResult[$index]['idComment'] = $nodeDataAr[$index]['id_nodo'];
+                        $commentResult[$index]['idJob'] = $request['jobID'];
+                        $commentResult[$index]['positionCode'] = $positionCode;
+    //                  $commentResult['title'] = $nodeDataAr['titolo'];
+                        $commentResult[$index]['name'] = $nodeDataAr[$index]['nome'];
+                        $commentResult[$index]['text'] = $nodeDataAr[$index]['testo'];
+                        $commentResult[$index]['creationDate'] = $nodeDataAr[$index]['data_creazione'];
+                        $commentResult[$index]['locale'] = $this->languages[$idLanguage]['codice_lingua'];
+                        $commentResult[$index]['authorId'] = $nodeDataAr[$index]['u_id_user'];
+                        $commentResult[$index]['authorName'] = $nodeDataAr[$index]['u_name'];
+                        $commentResult[$index]['authorSurName'] = $nodeDataAr[$index]['u_surname'];
+                        $commentResult[$index]['authorEmail'] = $nodeDataAr[$index]['u_email'];
+                    }
+
+                    /*
+                     * view result in correct format
+                     */
+                    if ($format == 'xml') {
+                        $result = openLaborController::array2xml($commentResult,'jobComment');
+                        $result= str_replace('&', '&amp;',$result);
+                        header ("Content-type: text/xml");
+                    } else {
+                        header('Content-Type: application/json; charset=utf8');
+                        $result = json_encode($commentResult);
+                    }
+                    echo $result;
+
+                }
+            }
+        }
     }
     
     private function addCommentToJob($dataAr,$jobData, $serviceId = null, $instanceId= null) {
@@ -568,7 +641,7 @@ class RequestsController extends openLaborController {
         if (AMA_DB::isError($trainingData)) {
             $httpStatus = '400';
             $controller = new errorController();
-            $errorMsg = translateFN('Error reading Training id') . ' '.  $jobId;
+            $errorMsg = 'Error reading Training id' . ' '.  $jobId;
             $controller->printError('POST',$format,$errorMsg,$httpStatus);
         } else {
             $trainingData = $trainingData[0];
@@ -691,6 +764,16 @@ class RequestsController extends openLaborController {
             return $InsertId;
     }
     
+    /**
+     * 
+     */
+    private function getComment($idNode, $id_instance = null) {
+            $GLOBALS['dh'] = AMAOpenLaborDataHandler::instance(MultiPort::getDSN(DATA_PROVIDER));
+            $dh = $GLOBALS['dh'];
+//            $nodeDataAr = $dh->get_node_info($idNode);
+            $nodeDataAr = $dh->get_node_children($idNode, $id_instance);
+            return $nodeDataAr;
+    }
        /**
      * validate data sended by user
      * @param array $dataAr contains the data POSTED

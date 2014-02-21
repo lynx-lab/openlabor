@@ -29,8 +29,8 @@
     </service>
     <service>
         <service_code>004</service_code>
-        <service_name>jobs_vote</service_name>
-        <description>vote a jobs</description>
+        <service_name>jobs_comment_list</service_name>
+        <description>retrieve the list of comments of a job</description>
         <metadata>true</metadata>
         <type>realtime</type>
         <keywords></keywords>
@@ -67,6 +67,15 @@
         <service_code>008</service_code>
         <service_name>training_vote</service_name>
         <description>vote a training</description>
+        <metadata>true</metadata>
+        <type>realtime</type>
+        <keywords></keywords>
+        <group>training and job</group>
+    </service>
+    <service>
+        <service_code>009</service_code>
+        <service_name>jobs_vote</service_name>
+        <description>vote a jobs</description>
         <metadata>true</metadata>
         <type>realtime</type>
         <keywords></keywords>

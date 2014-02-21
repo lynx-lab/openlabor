@@ -5,7 +5,13 @@
  * 
  */
 class openLaborController {
+   public $languages;
+   
    public function __construct() {
+        $GLOBALS['common_dh'] = AMA_Common_DataHandler::instance();
+        $common_dh = $GLOBALS['common_dh'];
+        
+       $this->languages = $common_dh->find_languages();
 //       $this->LogRequest($_REQUEST,$_SERVER);
    } 
    

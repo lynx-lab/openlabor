@@ -667,7 +667,24 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
         }
         return $new_node_id;
     }
-    
+
+    /**
+     * 
+     */
+    public function get_node_children($node_id, $id_course_instance = null) {
+        $db =& $this->getConnection();
+        if (self::isError($db)) return $db;
+        $condition = null;
+        $values = array($node_id);
+        if ($id_course_instance != null) {
+            $condition = ' AND id_istanza = ?';
+            array_push($values, $id_course_instance);
+        }    
+        $sql = 'SELECT N.*, U.nome AS u_name, U.cognome AS u_surname, U.e_mail as u_email, U.id_utente as u_id_user FROM nodo AS N LEFT JOIN utente AS U ON (N.id_utente=U.id_utente) WHERE N.id_nodo_parent=?' . $condition; 
+        $res =  $this->getAllPrepared($sql, $values, AMA_FETCH_ASSOC);
+        return $res;
+//        parent::get_node_children($node_id, $id_course_instance);
+    }
     /**
      * list job offers
      * 
