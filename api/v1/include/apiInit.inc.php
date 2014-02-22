@@ -8,3 +8,5 @@
     $common_dh = AMA_Common_DataHandler::instance();
     $GLOBALS['common_dh'] = $common_dh;
   }
+  
+  $GLOBALS['allowedKeys'] = $allowedKeys;

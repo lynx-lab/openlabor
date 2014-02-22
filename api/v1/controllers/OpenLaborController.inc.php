@@ -51,6 +51,12 @@ class openLaborController {
         return $xmlData;        
     }
     
+    public function isAllowed($verb, $apikey = null, $ipAddress = null) {
+//        print_r($GLOBALS);
+        return (in_array($apikey, $GLOBALS['allowedKeys']) || ($verb == 'GET'));
+    }
+
+
     /**
      * 
      * @param type $XML (simpleXML object)

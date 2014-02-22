@@ -76,6 +76,7 @@ $requestObj = new Request;
 $url_elements = $requestObj->url_elements;
 $verb = $requestObj->verb; //get, put, post, delete
 if (isset($requestObj->parameters['service_code'])) {
+    $apiKey = $requestObj->parameters['api_key'];
     $service_code = $requestObj->parameters['service_code']; // 001, 002, 003, 
 }elseif (isset($url_elements[2])) {
     $service_code = $url_elements[2]; // 001, 002, 003, 
@@ -92,21 +93,31 @@ $controller_name = ucfirst($url_elements[1]).'Controller';
 
 if (class_exists($controller_name)) {
     $controller = new $controller_name();
-    if (ucfirst($url_elements[1]) == 'Requests') {
-        $action_name = strtolower($verb) . $service_code.'Action';
-    }
-    else {
-        $action_name = strtolower($verb) .'Action';
-    }
-    if (method_exists($controller, $action_name)) {
-        $controller->$action_name($requestObj->parameters,$requestObj->format,$url_elements);
-    }
-    else {
+    if (!$controller->isAllowed($verb, $apiKey)) {
         $controller = new errorController();
-        $errorMsg = 'method required does not exist' .': '. $action_name;
+        $errorMsg = 'API Key not allowed' .': '. strtolower($verb) . $service_code .' '. $apiKey;
         $httpStatus = '404';
         $controller->printError($verb,$requestObj->format,$errorMsg,$httpStatus,$requestObj->parameters,$url_elements);        
     }
+    else 
+    {
+        if (ucfirst($url_elements[1]) == 'Requests') {
+            $action_name = strtolower($verb) . $service_code.'Action';
+        }
+        else {
+            $action_name = strtolower($verb) .'Action';
+        }
+        if (method_exists($controller, $action_name)) {
+            $controller->$action_name($requestObj->parameters,$requestObj->format,$url_elements);
+        }
+        else {
+            $controller = new errorController();
+            $errorMsg = 'method required does not exist' .': '. $action_name;
+            $httpStatus = '404';
+            $controller->printError($verb,$requestObj->format,$errorMsg,$httpStatus,$requestObj->parameters,$url_elements);        
+        }
+    }
+    
 } else {
     $controller = new errorController();
 //    $errorMsg = translateFN('URL malformed');

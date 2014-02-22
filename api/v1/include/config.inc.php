@@ -83,3 +83,6 @@ define('media','qualificationRequired like \'%media%\'');
  */
 define('SEARCH_AND',true);
 define('LOGFILEREQUEST','log/openlaborRequest.txt');
+
+$allowedKeys = array ('num','num','num','num','num','num'); 
+
