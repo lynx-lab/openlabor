@@ -12,7 +12,7 @@ class openLaborController {
         $common_dh = $GLOBALS['common_dh'];
         
        $this->languages = $common_dh->find_languages();
-//       $this->LogRequest($_REQUEST,$_SERVER);
+       $this->LogRequest($_REQUEST,$_SERVER);
    } 
    
    /**
