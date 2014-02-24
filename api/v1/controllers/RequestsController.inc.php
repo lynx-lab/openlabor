@@ -16,7 +16,7 @@ class RequestsController extends openLaborController {
             $toSearch['cityCompany'] = $request['city'];
             $toSearch['qualificationRequired'] = $request['qualification'];
             $jobResult = $this->searchJobs($toSearch,'cityCompany');
-            $NumResult = count($jobResults);
+            $NumResult = count($jobResult);
             
         } else {
             $jobResult = $this->getJob($request['jobID']);
