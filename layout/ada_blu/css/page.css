@@ -299,6 +299,9 @@ UL#menu a:hover { color: #eaff00; }
 #esc A		 { background: url(../img/esci.png) no-repeat center left; display:block; padding:0 0 0 40px;  }
 	.selectedesc A { background: url(../img/selectedesc.png) no-repeat center left; }
 
+#search A		 { background: url(../img/timon.png) no-repeat center left; display:block; padding:0 0 0 40px;  }
+	.selectedesc A { background: url(../img/selectedtimon.png) no-repeat center left; }
+
 
 #journey {
 	background: url(../img/journey-pattern.png) repeat-x;

@@ -47,25 +47,32 @@
 <!-- MENU A TENDINA -->
 <div id="mainmenu">
 <ul id="menu">
-		<li id="actions" class="unselectedactions">
+		<!--li id="actions" class="unselectedactions">
 				<a href="browsing/registration.php">
 					 <i18n>registrati</i18n>
 				</a>
-		</li>
+		</li-->
 		<li id="tools" class="unselectedtools">
 				<a href="info.php">
            			 <i18n>informazioni</i18n>
 			        </a>
 	 </li>
+	  <li id="search">
+                    <a href="modules/jobSearch/search.php"><i18n>cerca</i18n></a>
+                </li>
         <li id="question_mark" class="unselectedquestion_mark">
 				<a href="help.php" target="_blank">
-					 <i18n>help</i18n>
+					 <i18n>aiuto</i18n>
 				</a>
         </li>
-	<!--li id="language_choose" class="language_choose">
-		| <a href="index.php?lang=bg">Български</a> | <a href="index.php?lang=en">English</a> | <a href="index.php?lang=es">Español</a> |  
-		 <a href="index.php?lang=is">Íslenska</a> | <a href="index.php?lang=it">Italiano</a> | <a href="index.php?lang=ro">Română</a> 
-	</li-->
+        <li id="question_mark" class="unselectedquestion_mark">
+				<a href="api/v1/doc/openlaborAPIspecification.html" target="_blank">
+					 <i18n>API specification</i18n>
+				</a>
+        </li>
+	   <li id="language_choose" class="language_choose">
+		|  <a href="index.php?lang=en">English</a> | <a href="index.php?lang=it">Italiano</a> </a> 
+	</li>
 	<br />
 	<li id="help_main" class="help_main">
 			<!--i18n>Explore the web site information or register and ask for a practitioner<i18n-->

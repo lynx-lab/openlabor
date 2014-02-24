@@ -96,16 +96,19 @@
                         <i18n>home</i18n>
                     </a>
                 </li>
+                 <li id="search">
+                    <a href="modules/jobSearch/search.php"><i18n>cerca</i18n></a>
+                </li>
                 <li id="question_mark" class="unselectedquestion_mark">
                     <a href="help.php" target="_blank">
                         <i18n>aiuto</i18n>
                     </a>
                 </li>
-                <li id="esc">
+                <!--li id="esc">
                     <a href="index.php">
                         <i18n>esci</i18n>
                     </a>
-                </li>
+                </li-->
             </ul>
             <!-- tendina -->
             <div id="dropdownmenu">

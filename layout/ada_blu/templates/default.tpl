@@ -40,9 +40,12 @@
                 <li id="home">
                     <a href="browsing/index.php"><i18n>home</i18n></a>
                 </li>
-                <li id="esc">
-                    <a href="index.php"><i18n>esci</i18n></a>
+                 <li id="search">
+                    <a href="modules/jobSearch/search.php"><i18n>cerca</i18n></a>
                 </li>
+                <!--"li id="esc">
+                    <a href="index.php"><i18n>esci</i18n></a>
+                </li-->
             </ul>
             <!-- / menu -->
         </div>
