@@ -74,19 +74,6 @@ class searchHtmlLib {
     }
     
     public static function jobCardTable($jobsData,$withLink=false) {
-        /*
-        $summary =  translateFN('Risultati della ricerca'); // per: '.$labelsDesc;
-         $thead_data = array(
-              translateFN('Position'),
-              translateFN('Position Code'),
-              translateFN('Job Expiration'),
-              translateFN('City of company'),
-              translateFN('Qualification required'),
-              translateFN('CPI'),
-          );
-        $tbody_dataAr = array();
-         * 
-         */
 
         foreach ($jobsData as $singleJobObj) {
             $singleJobData = (array)$singleJobObj;
@@ -223,6 +210,190 @@ class searchHtmlLib {
         return $jobsTable;
         
     }
+    
+  /**
+   * 
+   * @param type $jobsData
+   * @param type $withLink
+   * @return type object
+   */  
+  public static function TrainingTable($Data,$withLink) {
+        $summary =  translateFN('Risultati della ricerca'); // per: '.$labelsDesc;
+         $thead_data = array(
+              translateFN('Training'),
+              translateFN('Training provider'),
+              translateFN('Training adrress'),
+              translateFN('City'),
+              translateFN('Duration (hours)'),
+              translateFN('Type')
+          );
+        $tbody_dataAr = array();
+
+        foreach ($Data as $singleObj) {
+            $singleData = (array)$singleObj;
+            if ($withLink) {
+                $href = HTTP_ROOT_DIR.'/modules/jobSearch/search.php?op=tcard&id='.$singleData['idTraining'];
+                $textLink = $singleData['nameTraining'];
+                $linkCard = BaseHtmlLib::link($href, $textLink);
+                $singleData['nameTraining'] =$linkCard; 
+                
+            }
+            $tbody_dataAr[] = array(
+                  $singleData['nameTraining'],
+                  $singleData['company'],
+                  $singleData['trainingAddress'],
+                  $singleData['city'],
+                  $singleData['durationHours'],
+                  $singleData['trainingType']
+            );
+
+        }
+        $element_attributes ="id:sortableTable, class:dataTable";
+        $trainingTable = BaseHtmlLib::tableElement($element_attributes, $thead_data, $tbody_dataAr);
+        return $trainingTable;
+    }
+
+    /**
+     * 
+     * @param array $Data
+     * @param string $withLink
+     * @return object $Table
+     */
+    public static function trainingCardTable($Data,$withLink=false) {
+
+        foreach ($Data as $singleObj) {
+            $singleData = (array)$singleObj;
+            if ($withLink) {
+//                $linkToDetail = '<a href='.HTTP_ROOT_DIR.'/browsing/external_link.php?url='. $singleJobData['linkMoreInfo'];
+                $linkToDetail = '<a href='.$singleData['t_linkMoreInfo'];
+                $linkToDetail .= ' target="_blank">'.$singleData['nameTraining'].'</a>';
+                $singleata['nameTraining'] =$linkToDetail; 
+                /*
+                $href = HTTP_ROOT_DIR.'/browsing/external_link.php?url='. $singleJobData['linkmoreinfo'];
+                $textLink = $singleJobData['position'];
+                $linkJobCard = BaseHtmlLib::link($href, $textLink);
+                $singleJobData['position'] =$linkJobCard; 
+                 * 
+                 */
+                /*
+                 * LINK TO CPI (MAP AND DATA)
+                 */
+
+            }
+//            print_r($singleJobData);
+            /*
+            $tbody_dataAr[] = array(
+                translateFN('Position'),
+                $singleJobData['position']
+            );
+            $tbody_dataAr[] = array(
+                translateFN('Job Expiration'),
+                AMA_Common_DataHandler::ts_to_date($singleJobData['jobexpiration']),
+            );
+             * 
+             */
+          if ($singleData['t_minAge'] > 0 && $singleData['t_maxAge']> 0) {
+              $age = $singleData['t_minAge'] . ' - '. $singleData['t_maxAge'];
+          } else {
+              $age = translateFN('No Limited');
+          }
+ 
+           $tbody_dataAr = array(
+               array(
+                    translateFN('Training'),
+                    $singleData['nameTraining']
+               ),
+               array(
+                   translateFN('Provider'),
+                   $singleData['company']
+               ),
+                array(
+                    translateFN('Adress'),
+                    $singleData['trainingAddress']
+               ),
+               /*
+                array(
+                    translateFN('Job Expiration'),
+                    AMA_Common_DataHandler::ts_to_date($singleJobData['jobExpiration'])
+               ),
+                * 
+                */
+               array(
+                   translateFN('Città'),
+                   $singleData['city']
+               ),
+               array(
+                   translateFN('Duration (hours)'),
+                   $singleData['durationHours']
+               ),
+               array(
+                   translateFN('Type'),
+                   $singleData['trainingType']
+               ),
+                array(
+                    translateFN('Phone'),
+                    $singleData['phone']
+               ),
+                array(
+                    translateFN('Centro Per l\'Impiego'),
+                    $singleData['CPIname']
+               ),
+               array(
+                   translateFN('Qualification required'),
+                   $singleData['t_qualificationRequired']
+               ),
+               array(
+                   translateFN('Experience required'),
+                   $singleData['experienceRequired']
+               ),
+               array(
+                   translateFN('Age'),
+                   $age
+               ),
+               array(
+                   translateFN('Other info'),
+                   $singleData['t_notes']
+               ),
+               array(
+                   translateFN('Reserved for disable'),
+                   $singleData['t_reservedForDisabled']
+               ),
+               array(
+                   translateFN('Favored Category requested'),
+                   $singleData['t_favoredCategoryRequests']
+               ),
+           );
+
+        }
+        /*
+            $singleJobData['positioncode'],
+              AMA_Common_DataHandler::ts_to_date($singleJobData['jobexpiration']),
+              $singleJobData['citycompany'],
+              $singleJobData['qualificationrequired'],
+              $singleJobData['namecpi']
+        );
+         * 
+         */
+
+        $element_attributes ="id:jcard, class:jcard";
+        $Table = BaseHtmlLib::tableElement($element_attributes, $thead_data, $tbody_dataAr);
+        return $Table;
+        
+    }
+    
+    public static function trainingShow($CPIData,$withLink=false) {
+      $cpi_container = CDOMElement::create('div','id:map_container');
+      $map_div = CDOMElement::create('div','id:map');
+      $cpi_container->addChild($map_div); 
+      $data_div = CDOMElement::create('div','id:cpi_data');
+      $data_list = BaseHtmlLib::plainListElement('class:cpi_data', $CPIData, FALSE);
+      $data_div->addChild($data_list); 
+    
+      $cpi_container->addChild($data_div); 
+      return $cpi_container;
+   }
+
+    
     
 }
 

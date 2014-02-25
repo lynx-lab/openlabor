@@ -24,7 +24,7 @@
     define('SEARCH_JOBS','001');
     define('JOB_REPORT','002');
     define('JOB_COMMENT','003');
-    define('JOB_VOTE','004');
+    define('JOB_COMMENT_RETRIEVE','004');
     define('SEARCH_TRAINING','005');
     define('TRAINING_REPORT','006');
     define('TRAINING_COMMENT','007');

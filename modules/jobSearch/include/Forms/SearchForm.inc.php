@@ -18,6 +18,7 @@ class SearchForm extends FForm {
         parent::__construct();
 
         $this->addTextInput('keywords', translateFN('Qualifica/Corso'));
+        $this->setMethod('GET');
 
 /*             ->setRequired()
              ->setValidator(FormValidator::NOT_EMPTY_STRING_VALIDATOR);

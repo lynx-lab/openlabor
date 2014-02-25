@@ -88,15 +88,15 @@ $go_back_link->addChild(new CText(translateFN('Indietro')));
 
 
 
-if(isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'POST') {
+if(isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'GET' && (isset($_GET['submit']))) {
 
-    if (!array_key_exists('op', $_POST)) {
+    if (!array_key_exists('op', $_GET)) {
     //    $op = 'training';
         $op = 'jobs';
         $service_code = SEARCH_JOBS;
 //        $op = '001';
     } else {
-        $op = $_POST['op'];
+        $op = $_GET['op'];
     }
     switch ($op) {
         case 'jobs':
@@ -106,18 +106,18 @@ if(isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'POST') {
             $service_code = SEARCH_TRAINING;
             break;
     }
-    if (array_key_exists('out', $_POST)) {
-        $out = $_POST['out'];
+    if (array_key_exists('out', $_GET)) {
+        $out = $_GET['out'];
     }
-    if (!($_POST)) {
-        $_POST['qualificationRequired'] = null;
-        $_POST['keywords'] = null;
-        $_POST['city'] = null;
+    if (!($_GET)) {
+        $_GET['qualificationRequired'] = null;
+        $_GET['keywords'] = null;
+        $_GET['city'] = null;
     } 
 
-    $toSearch['qualificationRequired'] = $_POST['qualification'];
-    $toSearch['keywords'] = $_POST['keywords'];
-    $toSearch['city'] = $_POST['city'];
+    $toSearch['qualificationRequired'] = $_GET['qualification'];
+    $toSearch['keywords'] = $_GET['keywords'];
+    $toSearch['city'] = $_GET['city'];
 
     /*
      * Service code defines operation 
@@ -153,7 +153,7 @@ if(isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'POST') {
 
     /*
      * In case method is GET
-     * we have to make the URL with the POST data
+     * we have to make the URL with the GET data
      */
     $curlPost = false;
     if (!$curlPost) {
@@ -249,17 +249,39 @@ if(isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'POST') {
             break;
             
         case 'training':
-            $elements = array('Comune','CourseName','Istituto','DurataCorsoOre');
-            $labelsDesc = array('Comune', 'Nome', 'Istituto', 'Durata (ore)');
-            if ($out == 'html') {
-                    $remoteTraining->show_tabled_data($summary,$elements,$labelsDesc,$min,$max);
-                    $searchResult = $remoteTraining->getHtml();
-                    $result = $searchResult;
-                    echo $result;
+            $withLink = true;
+            $jobsTable = searchHtmlLib::TrainingTable($jobsData, $withLink);
+            $data = $jobsTable->getHtml();
+
+            $searchParameter = '';
+            if ($toSearch['keywords'] == '' && $toSearch['city'] == '' && $toSearch['qualificationRequired'] == '') {
+                $searchParameter = translateFN('Tutto');
+
             } else {
-                $jsonData = $remoteTraining->getJsonData();
-                echo $jsonData;
-            }
+                if ($toSearch['keywords'] != '') {
+                    $searchParameter .= $toSearch['keywords'];
+                }
+                if ($toSearch['city'] != '') {
+                    if ($searchParameter != '') {
+                        $searchParameter .= ', ';
+                    }
+                    $searchParameter .= $toSearch['city'];
+                }
+                if ($toSearch['qualificationRequired'] != '') {
+                    if ($searchParameter != '') {
+                        $searchParameter .=', ';
+                    }
+                    $searchParameter .= $toSearch['qualificationRequired'];
+                }
+            }    
+
+            $help = translateFN('Hai cercato').': '. $searchParameter; 
+            $href = HTTP_ROOT_DIR.'/modules/jobSearch/search.php';
+            $textLink = translateFN('Cambia i parametri di ricerca');
+            $linkNewSearch = BaseHtmlLib::link($href, $textLink);
+            $help .= ' - ' . $linkNewSearch->getHtml();
+            
+        
             break;
     }
     /*
@@ -275,8 +297,7 @@ if(isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'POST') {
      */
     $dataTablesLanguage = 'language_'.$_SESSION['sess_user_language'].'.txt';
     $userLanguage = $_SESSION['sess_user_language'];
-//    $options['onload_func'] = "dataTablesExec('$userLanguage');";
-//    $options['onload_func'] = 'dataTablesExec("it")';
+
     $options['onload_func'] = 'dataTablesExec()';
 //  $optionsAr = array('onload_func' => "close_page('$close_page_message');");
 //  $optionsAr = array('onload_func' => "dataTablesExec('$userLanguage');");
@@ -308,6 +329,129 @@ if(isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'POST') {
             }
             $help = ucfirst(translateFN('offer details')); 
             break;
+        case 'tcard':
+            $service_code = SEARCH_TRAINING;
+            /*
+             * Send request to the api
+             * using the REST_request class
+             */
+            if(DataValidator::is_uinteger($_GET['id']) !== false) {
+                $layout_dataAr['JS_filename'] = array(
+                                MODULES_DIR.'/jobSearch/js/leaflet/leaflet.js',
+                                MODULES_DIR.'/jobSearch/js/leaflet_map.js'
+
+                        );
+                $layout_dataAr['CSS_filename']= array(
+                                MODULES_DIR.'/jobSearch/js/leaflet/leaflet.css'
+                        );
+                $withLink = TRUE;
+                $id = $_GET['id'];
+                $jsonToSearch = '';
+                $curlHeader = '';
+                $curlPost = false;
+                $format = 'json';
+                $urlApi = URL_API_REQUESTS.'.'.$format.'?service_code='.$service_code.'&ID='.$id;
+                $Result = REST_request::sendRequest($jsonToSearch,$curlHeader,$urlApi,$curlPost);
+                $DataObj = json_decode($Result);
+                $DataAll = (array)$DataObj;
+                $Data = (array)$DataAll[0];
+                $lat = $Data['t_latitude'];
+                $lon = $Data['t_longitude'];
+    //            $lon = ($lon*-1);
+                $zoom = '16';
+                $PoppetContent = htmlspecialchars($Data['nameTraining'],ENT_QUOTES) .'<BR /> ' 
+			. htmlspecialchars($Data['trainingAddress'],ENT_QUOTES)
+			.'<BR /> ' . $Data['CAP'].'<BR /> ' 
+			. htmlspecialchars($Data['city'],ENT_QUOTES);
+                $PoppetContent = htmlspecialchars($PoppetContent,ENT_QUOTES);
+                
+                $options['onload_func'] = "makeMap('$lat','$lon','$zoom','$PoppetContent')";
+                
+                //print_r($cpiData);
+                unset($Data['t_latitude']);
+                unset($Data['t_longitude']);
+                unset($Data['idTraining']);
+                unset($Data['IdTrainingOriginal']);
+                unset($Data['hash']);
+                unset($Data['t_published']);
+                unset($Data['t_idNode']);
+                unset($Data['t_locale']);
+                unset($Data['t_dateInsert']);
+                unset($Data['t_expiration']);
+                
+                $DataHtml = searchHtmlLib::trainingShow($Data);
+                $data = $DataHtml->getHtml(); 
+                
+                
+//                $Table = searchHtmlLib::trainingCardTable($DataObj, $withLink);
+                //$data = $Table->getHtml();
+            } else {
+                $data = 'scheda';
+            }
+            $help = ucfirst(translateFN('training details')); 
+            break;            
+        case 'tMap':
+            $service_code = SEARCH_TRAINING;
+            /*
+             * Send request to the api
+             * using the REST_request class
+             */
+            if(DataValidator::is_uinteger($_GET['id']) !== false) {
+                $layout_dataAr['JS_filename'] = array(
+                                MODULES_DIR.'/jobSearch/js/leaflet/leaflet.js',
+                                MODULES_DIR.'/jobSearch/js/leaflet_map.js'
+
+                        );
+                $layout_dataAr['CSS_filename']= array(
+                                MODULES_DIR.'/jobSearch/js/leaflet/leaflet.css'
+                        );
+                $withLink = TRUE;
+                $id = $_GET['id'];
+                $jsonToSearch = '';
+                $curlHeader = '';
+                $curlPost = false;
+                $format = 'json';
+                $urlApi = URL_API_REQUESTS.'.'.$format.'?service_code='.$service_code.'&ID='.$id;
+                $Result = REST_request::sendRequest($jsonToSearch,$curlHeader,$urlApi,$curlPost);
+                $DataObj = json_decode($Result);
+                $DataAll = (array)$DataObj;
+                $Data = (array)$DataAll[0];
+                $lat = $Data['t_latitude'];
+                $lon = $Data['t_longitude'];
+    //            $lon = ($lon*-1);
+                $zoom = '16';
+                $PoppetContent = htmlspecialchars($Data['nameTraining'],ENT_QUOTES) .'<BR /> ' 
+			. htmlspecialchars($Data['trainingAddress'],ENT_QUOTES)
+			.'<BR /> ' . $Data['CAP'].'<BR /> ' 
+			. htmlspecialchars($Data['city'],ENT_QUOTES);
+                $PoppetContent = htmlspecialchars($PoppetContent,ENT_QUOTES);
+                
+                $options['onload_func'] = "makeMap('$lat','$lon','$zoom','$PoppetContent')";
+                
+                //print_r($cpiData);
+                unset($Data['t_latitude']);
+                unset($Data['t_longitude']);
+                unset($Data['idTraining']);
+                unset($Data['IdTrainingOriginal']);
+                unset($Data['hash']);
+                unset($Data['t_published']);
+                unset($Data['t_idNode']);
+                unset($Data['t_locale']);
+                unset($Data['t_dateInsert']);
+                unset($Data['t_expiration']);
+                
+                $DataHtml = searchHtmlLib::trainingShow($Data);
+                $data = $DataHtml->getHtml(); 
+                
+                
+//                $Table = searchHtmlLib::trainingCardTable($DataObj, $withLink);
+                //$data = $Table->getHtml();
+            } else {
+                $data = 'scheda';
+            }
+            $help = ucfirst(translateFN('training details')); 
+            break;            
+            
         case 'cpi':
             $layout_dataAr['JS_filename'] = array(
                             MODULES_DIR.'/jobSearch/js/leaflet/leaflet.js',
