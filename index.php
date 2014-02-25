@@ -42,6 +42,7 @@ if (isset($_SESSION['ada_access_from'])) {
     exit();
   }
 }
+
 session_unset();
 session_destroy();
 
@@ -71,6 +72,14 @@ include_once 'include/'.$self.'_functions.inc.php';
 
 $lang_get = $_GET['lang'];
 
+/**
+ * sets language if it is not multiprovider
+ * if commented, then language is handled by ranslator::negotiateLoginPageLanguage
+ * that will check if the browser language is supported by ADA and set it accordingly
+ */
+
+// if (!MULTIPROVIDER && defined('PROVIDER_LANGUAGE')) $lang_get = PROVIDER_LANGUAGE;
+
 
 /**
  * Negotiate login page language
@@ -84,6 +93,13 @@ $_SESSION['sess_user_language'] = $login_page_language_code;
  *
  */
 $_SESSION['ada_remote_address'] = $_SERVER['REMOTE_ADDR'];
+
+/**
+ * giorgio 12/ago/2013
+ * if it isn't multiprovider, loads proper files into clients directories
+ */
+if (!MULTIPROVIDER && isset ($GLOBALS['user_provider'])) $files_dir = $root_dir.'/clients/'.$GLOBALS['user_provider'];
+else $files_dir = $root_dir;
 
 /*
  * Load news file
@@ -99,35 +115,35 @@ $_SESSION['ada_remote_address'] = $_SERVER['REMOTE_ADDR'];
 */
 
 if ($newsmsg == ''){
-   $newsfile = $root_dir.'/docs/news/'.$newsfile; //  txt files in ada browsing directory
+   $newsfile = $files_dir.'/docs/news/'.$newsfile; //  txt files in ada browsing directory
    if ($fid = @fopen($newsfile,'r')){
       while (!feof($fid))
         $newsmsg .= fread($fid,4096);
       fclose($fid);
     } else {
-       $newsmsg = translateFN("File news non trovato");
+       $newsmsg = '<p>'.translateFN("File news non trovato").'</p>';
     }
 }
 
 if ($hlpmsg == ''){
-   $helpfile = $root_dir.'/docs/help/'.$helpfile;  //  txt files in ada browsing directory
+   $helpfile = $files_dir.'/docs/help/'.$helpfile;  //  txt files in ada browsing directory
    if ($fid = @fopen($helpfile,'r')){
       while (!feof($fid))
         $hlpmsg .= fread($fid,4096);
       fclose($fid);
     } else {
-       $hlpmsg = translateFN("File help non trovato");
+       $hlpmsg = '<p>'.translateFN("File help non trovato").'</p>';
     }
 }
 
 if ($infomsg == ''){
-   $infofile = $root_dir.'/docs/info/'.$infofile;  //  txt files in ada browsing directory
+   $infofile = $files_dir.'/docs/info/'.$infofile;  //  txt files in ada browsing directory
    if ($fid = @fopen($infofile,'r')){
       while (!feof($fid))
         $infomsg .= fread($fid,4096);
       fclose($fid);
     } else {
-       $infomsg = translateFN("File info non trovato");
+       $infomsg = '<p>'.translateFN("File info non trovato").'</p>';
     }
 }
 
@@ -144,24 +160,49 @@ if(isset($p_login)) {
     //User has correctly inserted un & pw
 
     $userObj = MultiPort::loginUser($username, $password);
-    if ((is_object($userObj)) && ($userObj instanceof ADALoggableUser)){     
+    
+    if ((is_object($userObj)) && ($userObj instanceof ADALoggableUser)){
       $status = $userObj->getStatus();
 	  if ($status == ADA_STATUS_REGISTERED)
       {
+      	/**
+      	 * @author giorgio 12/dic/2013
+      	 * when a user sucessfully logs in, regenerate her session id.
+      	 * this fixes a quite big problem in the 'history_nodi' table
+      	 */
+      	session_regenerate_id();
+      	
+      	$user_default_tester = $userObj->getDefaultTester();
+      	
+      	if (!MULTIPROVIDER && $userObj->getType()!=AMA_TYPE_ADMIN) 
+      	{
+      		if ($user_default_tester!=$GLOBALS['user_provider'])
+      		{
+      			// if the user is trying to login in a provider
+      			// that is not his/her own,
+      			// redirect to his/her own provider home page      			
+      			$redirectURL = preg_replace("/(http[s]?:\/\/)(\w+)[.]{1}(\w+)/", "$1".$user_default_tester.".$3", $userObj->getHomePage());
+      			header('Location:'.$redirectURL);
+		  		exit();
+      		}      		       		
+      	}
+      	
         // user is a ADAuser with status set to 0 OR
         // user is admin, author or switcher whose status is by default = 0
-    	  $_SESSION['sess_user_language'] = $p_selected_language;
-		  $_SESSION['sess_id_user'] = $userObj->getId();
-		  $GLOBALS['sess_id_user']  = $userObj->getId();
-		  $_SESSION['sess_id_user_type'] = $userObj->getType();
-		  $GLOBALS['sess_id_user_type']  = $userObj->getType();
-		  $_SESSION['sess_userObj'] = $userObj;
-		  $user_default_tester = $userObj->getDefaultTester();
-		  if($user_default_tester !== NULL) {
-		    $_SESSION['sess_selected_tester'] = $user_default_tester;
-		  }
+    	$_SESSION['sess_user_language'] = $p_selected_language;
+		$_SESSION['sess_id_user'] = $userObj->getId();
+		$GLOBALS['sess_id_user']  = $userObj->getId();
+		$_SESSION['sess_id_user_type'] = $userObj->getType();
+		$GLOBALS['sess_id_user_type']  = $userObj->getType();
+	    $_SESSION['sess_userObj'] = $userObj;
 
-		  header('Location:'.$userObj->getHomePage());
+		if($user_default_tester !== NULL) {
+					$_SESSION ['sess_selected_tester'] = $user_default_tester;
+					// sets var for non multiprovider environment
+					$GLOBALS ['user_provider'] = $user_default_tester;		    
+		  }
+		  $redirectURL = $userObj->getHomePage();      	
+		  header('Location:'.$redirectURL);
 		  exit();
 		}
 		else {
@@ -183,10 +224,49 @@ if(isset($p_login)) {
 /**
  * Show login page
  */
-$form_action = HTTP_ROOT_DIR .'/index.php';
+$form_action = HTTP_ROOT_DIR ;
+$form_action .= '/index.php';
 $login = UserModuleHtmlLib::loginForm($form_action, $supported_languages,$login_page_language_code, $login_error_message);
 
 //$login = UserModuleHtmlLib::loginForm($supported_languages,$login_page_language_code, $login_error_message);
+ /**
+ * giorgio 12/ago/2013
+ * set up proper link path and tester for getting the news in a multiproivder environment
+ */
+  if (!MULTIPROVIDER)
+  {
+  	if (isset($GLOBALS['user_provider']) && !empty($GLOBALS['user_provider']))
+  	{
+		$testerName = $GLOBALS['user_provider'];
+  	} else {
+  		/**
+  		 * overwrite $newsmsg with generated available providers listing
+  		 */
+  		$allTesters = $common_dh->get_all_testers (array('nome'));
+  		$addHtml = false;
+
+  		foreach ($allTesters as $aTester)
+  		{  			
+  			// skip testers having punatore like 'clientXXX'
+  			if (!preg_match('/^(?:client)[0-9]{1,2}$/',$aTester['puntatore']) &&
+  				is_dir (ROOT_DIR . '/clients/' .$aTester['puntatore'])) {
+  				
+  				if (!$addHtml) $providerListUL = CDOMElement::create('ol');
+  				$addHtml = true;
+  				$testerLink = CDOMElement::create('a','href:'.preg_replace("/(http[s]?:\/\/)(\w+)[.]{1}(\w+)/", "$1".$aTester['puntatore'].".$3", HTTP_ROOT_DIR));
+  				$testerLink->addChild (new CText($aTester['nome']));
+
+  				$providerListElement = CDOMElement::create('li');
+  				$providerListElement->addChild ($testerLink);
+  				$providerListUL->addChild ($providerListElement);
+  			}
+  		}
+  		$newsmsg = $addHtml ? $providerListUL->getHtml() : translateFN ('Nessun fornitore di servizi &egrave; stato configurato');
+  	}
+  } else  {
+  	$testers = $_SESSION['sess_userObj']->getTesters();
+  	$testerName = $testers[0];
+  } // end if (!MULTIPROVIDER)
 
   $forget_div  = CDOMElement::create('div');
   $forget_linkObj = CDOMElement::create('a', 'href:'.HTTP_ROOT_DIR.'/browsing/forget.php?lan='.$_SESSION['sess_user_language']);
@@ -200,17 +280,121 @@ if(isset($_GET['message'])) {
   $message->addChild(new CText($_GET['message']));
 }
 
+/*
+ *  Load news from public course indicated in PUBLIC_COURSE_ID_FOR_NEWS
+ */
+if (isset($testerName))
+{
+	$tester_dh = AMA_DataHandler::instance(MultiPort::getDSN($testerName));
+	// select nome or empty string (whoever is not null) as title to diplay for the news
+	$newscontent = $tester_dh->find_course_nodes_list(
+			array ( "COALESCE(if(nome='NULL' OR ISNULL(nome ),NULL, nome), '')", "testo" ) ,
+			"1 ORDER BY data_creazione DESC LIMIT ".NEWS_COUNT,
+			PUBLIC_COURSE_ID_FOR_NEWS);
+
+	// watch out: $newscontent is NOT associative
+	$bottomnewscontent = '';
+	$maxLength = 600;
+	if (!AMA_DB::isError($newscontent) && count($newscontent)>0)
+	{
+		foreach ( $newscontent as $num=>$aNews )
+		{
+			$aNewsDIV = CDOMElement::create('div','class:news,id:news-'.($num+1));
+			$aNewsTitle = CDOMElement::create('a', 'class:newstitle,href:'.HTTP_ROOT_DIR.'/browsing/view.php?id_course='.
+					PUBLIC_COURSE_ID_FOR_NEWS.'&id_node='.$aNews[0]);
+			$aNewsTitle->addChild (new CText($aNews[1]));
+			$aNewsDIV->addChild ($aNewsTitle);
+
+			// @author giorgio 01/ott/2013
+			// remove unwanted div ids: tabs
+			// NOTE: slider MUST be removed BEFORE tabs because tabs can contain slider and not viceversa
+			$removeIds = array ('slider','tabs');
+			
+			$html = new DOMDocument('1.0', 'UTF-8');
+			$html->loadHTML(utf8_decode($aNews[2]));
+
+			foreach ($removeIds as $removeId)
+			{
+				$removeElement = $html->getElementById($removeId);
+				if (!is_null($removeElement)) $removeElement->parentNode->removeChild($removeElement);				
+			}
+			
+			// output in newstext only the <body> of the generated html
+			$newstext = '';
+			foreach ($html->getElementsByTagName('body')->item(0)->childNodes as $child)
+			{
+				$newstext .= $html->saveXML($child);
+			}
+			// strip off html tags
+			$newstext = strip_tags($newstext);
+			// check if content is too long...
+			if (strlen($newstext) > $maxLength)
+			{
+				// cut the content to the first $maxLength characters of words (the $ in the regexp does the trick)
+				$newstext = preg_replace('/\s+?(\S+)?$/', '', substr($newstext, 0, $maxLength+1));
+				$addContinueLink = true;
+			}
+			else $addContinueLink = false;
+
+			$aNewsDIV->addChild (new CText("<p class='newscontent'>".$newstext.'</p>'));
+
+			if ($addContinueLink)
+			{
+				$contLink = CDOMElement::create('a', 'class:continuelink,href:'.HTTP_ROOT_DIR.'/browsing/view.php?id_course='.
+						PUBLIC_COURSE_ID_FOR_NEWS.'&id_node='.$aNews[0]);
+				$contLink->addChild (new CText(translateFN('Continua...')));
+				$aNewsDIV->addChild ($contLink);
+			}
+			$bottomnewscontent .= $aNewsDIV->getHtml();
+		}
+	}
+}  else $bottomnewscontent = '';
+
+
 $content_dataAr = array(
 	'form' => $login->getHtml().$forget_link,
-	'text' => $newsmsg,
-	'help' => $hlpmsg,
-    'info' => $infomsg,
+	'newsmsg' => $newsmsg,
+	'helpmsg' => $hlpmsg,
+    'infomsg' => $infomsg,
+	'bottomnews' => $bottomnewscontent,
 	'status' => $status,
 	'message' => $message->getHtml()
 );
 
 /**
- * Sends data to the rendering engine
+ * @author giorgio 26/set/2013
+ * 
+ * if you have some widget in the page and need to
+ * pass some parameter to it, you can do it this way:
+ * 
+ * $layout_dataAr['widgets']['<template_field_name>'] = array ("<param_name>"=>"<param_value>");
  */
-ARE::render($layout_dataAr,$content_dataAr);
+
+/**
+ * Sends data to the rendering engine
+ * 
+ * @author giorgio 25/set/2013
+ * REMEMBER!!!! If there's a widgets/main/index.xml file
+ * and the index.tpl has some template_field for the widget
+ * it will be AUTOMAGICALLY filled in!!
+ */
+// ARE::render($layout_dataAr,$content_dataAr);
+		$layout_dataAr['JS_filename'] = array(
+				JQUERY,
+				JQUERY_UI,
+				JQUERY_NO_CONFLICT,
+				ROOT_DIR . "/js/main/index.js"
+		);
+/**
+ * @author giorgio 
+ * include the jQuery and uniform css for proper styling
+ */		
+		$layout_dataAr['CSS_filename'] = array (
+				JQUERY_UI_CSS,
+				JQUERY_UNIFORM_CSS
+		);
+			
+		$optionsAr['onload_func'] = 'initDoc();';
+		
+ARE::render($layout_dataAr, $content_dataAr, NULL, (isset($optionsAr) ? $optionsAr : NULL) );
 ?>
