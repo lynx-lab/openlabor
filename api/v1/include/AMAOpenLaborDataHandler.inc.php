@@ -331,7 +331,7 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
 //                foreach ($oldOffers as $oneOldOffer) {
 //                    if (in_array($oneJobData['idJobOriginal'],$oneOldOffer)) {
                 foreach ($oldTrainings as $oldOneTraining) {
-                    if ($oneTrainingData['IdJobOriginal'] == $oldOneTraining['idJobOriginal']) {
+                    if ($oneTrainingData['IdTrainingOriginal'] == $oldOneTraining['idTrainingOriginal'] && $oldOneTraining['idTrainingOriginal'] > 0) {
                         unset($oldTrainings[$o]);
                         $TrainingAlreadyExists = true;
                         $o++;
