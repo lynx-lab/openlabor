@@ -534,7 +534,7 @@ class RequestsController extends openLaborController {
                 if (count($professionCodes) > 0) {
                     $foundKeywords = true;
                     
-                    $clause .= ' AND ';
+                    $clause .= ' AND T.idTraining = I.id_TC_training AND';
 
                     $numberCode = NUMBER_CODE;
                     if ((count($professionCodes))  <= NUMBER_CODE) {
@@ -549,7 +549,7 @@ class RequestsController extends openLaborController {
                         $professionCode = $professionCodes[$i]['category'];
                         switch ($i) {
                             case 0:
-                                $clauseKey = '(trainingCode like \''.$professionCode.'%\'';
+                                $clauseKey = '(I.ISTATCode like \''.$professionCode.'%\'';
                                 break;
                             /*
                             case $numberCode:
@@ -558,7 +558,7 @@ class RequestsController extends openLaborController {
                              * 
                              */
                             default:
-                                $clauseKey .= ' OR trainingCode like \''.$professionCode.'%\'';
+                                $clauseKey .= ' OR I.ISTATCode like \''.$professionCode.'%\'';
                                 break;
                         }
                     }

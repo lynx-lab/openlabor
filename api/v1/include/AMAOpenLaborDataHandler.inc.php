@@ -764,10 +764,19 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
      * 
      * @return an error if something goes wrong or an array contains all the offers
      */
-    public function listTrainingOffers($condition='where 1') {
+    public function listTrainingOffers($condition='where 1', $codeToSearch = array()) {
         $db =& $this->getConnection();
         if (self::isError($db)) return $db;
-        $sql = 'SELECT  T.*  FROM `OL_training` as T'. ' ' .$condition; 
+        /*
+        if (sizeof($codeToSearch) > 0) {
+            $condition .= ' AND (';
+            foreach ($codeToSearch as $singleCode) {
+                $condition .= ' I.ISTATCode LIKE'; 
+            }
+        }
+         * 
+         */
+        $sql = 'SELECT distinct(T.idTraining), T.* FROM  `OL_training` AS T, OL_TrainingCode AS I' . ' ' .$condition; 
 //        print_r($sql);
         $res =  $this->getAllPrepared($sql, null, AMA_FETCH_ASSOC);
         return $res;
