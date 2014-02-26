@@ -60,6 +60,7 @@ switch ($typeData) {
        $jobsData =  $remoteJobs->contents;
        $Jobs = $dh->addJobOffers($jobsData);
        print_r($Jobs);
+       break;
 
     case 'training':
        echo 'start time:' . AMA_DataHandler::ts_to_date(time(), "%d/%m/%Y %H:%M:%S") . '<BR />'; 
@@ -86,7 +87,13 @@ switch ($typeData) {
                     */
                    $nameToSearch = urlencode($singleTraining['nameTraining']);
 //                   $singleTraining['trainingCode'] = utility::getIstatCode($singleTraining['nameTraining']);
-                   $singleTraining['trainingCode'] = utility::getIstatCode($nameToSearch);
+                   $getSingleCode = false;
+                   $ISTATCodes = utility::getIstatCode($nameToSearch,$getSingleCode);
+                   $singleTrainingCodeAr = array();
+                   foreach ($ISTATCodes as $ISTATCode) {
+                       array_push($singleTrainingCodeAr, $ISTATCode['category']);
+                   }
+                   $singleTraining['trainingCode'] = $singleTrainingCodeAr;
                    /*
                     * 
                     */

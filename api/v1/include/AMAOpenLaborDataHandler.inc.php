@@ -350,7 +350,7 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
         return $idInserted;
     }
 
-        /**
+     /**
      * add training offer to table
      */
     public function addTrainingOffer($TrainingData) {
@@ -367,7 +367,7 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
         $data = array(
             'IdTrainingOriginal'=>$this->or_zero($TrainingData['IdTrainingOriginal']),
             'nameTraining'=>$this->sql_prepared($TrainingData['nameTraining']),
-            'trainingCode'=>$this->sql_prepared($trainingCode),
+            'trainingCode'=>$this->sql_prepared($trainingCode[0]),
             'company'=>$this->sql_prepared($TrainingData['company']),
             'trainingAddress'=>$this->sql_prepared($TrainingData['trainingAddress']),
             'CAP'=>$this->sql_prepared($TrainingData['CAP']),
@@ -413,6 +413,7 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
             return new AMA_Error($this->errorMessage(AMA_ERR_ADD)." while in addTrainingOffer.".AMA_SEP.": ".$res->getMessage());
         }
         $trainingId = $db->lastInsertID();
+        $trainingCodeAdded = $this->addTrainingCode($trainingId,$TrainingData['trainingCode'] );
         $idNodeTraining = $this->addNodeTraining($TrainingData);
         if (!self::isError($idNodeTraining) && $idNodeTraining != null) {
             $TrainingData['t_idNode'] = $idNodeTraining;
@@ -423,7 +424,47 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
         
         return $trainingId;
     }
+    
+    /* *
+     * add training Code to table
+     */
+    public function addTrainingCode($idTraining, $codes = array()){
+        $db =& $this->getConnection();
+        if (self::isError($db)) return $db;
+        foreach ($codes as $singleCode) {
+            $sql = "INSERT INTO `OL_TrainingCode` (id_TC_training,ISTATCode) VALUES ($idTraining,'$singleCode')";
+            ADALogger::log_db("trying inserting the training Code: ".$sql);
 
+            $res = $db->query($sql);
+            // if an error is detected, an error is created and reported
+            if (self::isError($res)) {
+                return new AMA_Error($this->errorMessage(AMA_ERR_ADD)." while in addTrainingCode.".AMA_SEP.": ".$res->getMessage());
+            }
+            
+        }
+        return true;
+    }
+    
+    /* *
+     * add training Code to table
+     */
+    public function getTrainingCode($idTraining) {
+        $db =& $this->getConnection();
+        if (self::isError($db)) return $db;
+        foreach ($codes as $singleCode) {
+            $sql = "SELECT ISTATCode  FROM `OL_TrainingCode` where id_TC_training = $idTraining";
+            ADALogger::log_db("trying select the training Code: ".$sql);
+
+            $res =  $this->getAllPrepared($sql, null, AMA_FETCH_ORDERED);            // if an error is detected, an error is created and reported
+            if (self::isError($res)) {
+                return new AMA_Error($this->errorMessage(AMA_ERR_ADD)." while in addTrainingCode.".AMA_SEP.": ".$res->getMessage());
+            }
+            
+        }
+        return $res;
+    }
+    
+    
     /**
      * @author graffio  <graffio@lynxlab.com
      * @param Array $dataAr Trainig Offer data
@@ -732,6 +773,24 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
         return $res;
     }
 
+     /**
+     * list Training offers
+     * 
+     * @access public
+     * 
+     * @param 
+     * 
+     * @return an error if something goes wrong or an array contains all the offers
+     */
+    public function listTrainingFromISTATCode($code) {
+        $db =& $this->getConnection();
+        if (self::isError($db)) return $db;
+        $sql = 'SELECT T . * , C.ISTATCode FROM `OL_training` AS T, OL_TrainingCode AS C WHERE T.idTraining = C.id_TC_training AND C.`ISTATCode` like \''. $code.'%\'';
+//        print_r($sql);
+        $res =  $this->getAllPrepared($sql, null, AMA_FETCH_ASSOC);
+        return $res;
+    }
+    
     /**
      * retrive single Training Offers by ID
      * @param INT $trainingId

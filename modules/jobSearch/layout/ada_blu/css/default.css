@@ -492,6 +492,13 @@ td.jcard {
     float:left;
 }
 
+#job { 
+    width: 50%;
+    float:left;
+    padding-right: 0.3em;
+    border-right: 0.2em;
+}
+
 #cpi_data {
 padding: 1em;
 margin-left: 560px;

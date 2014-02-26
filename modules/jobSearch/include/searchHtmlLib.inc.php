@@ -213,7 +213,7 @@ class searchHtmlLib {
     
   /**
    * 
-   * @param type $jobsData
+   * @param type $Data
    * @param type $withLink
    * @return type object
    */  
@@ -243,6 +243,44 @@ class searchHtmlLib {
                   $singleData['company'],
                   $singleData['trainingAddress'],
                   $singleData['city'],
+                  $singleData['durationHours'],
+                  $singleData['trainingType']
+            );
+
+        }
+        $element_attributes ="id:sortableTable, class:dataTable";
+        $trainingTable = BaseHtmlLib::tableElement($element_attributes, $thead_data, $tbody_dataAr);
+        return $trainingTable;
+    }
+
+  /**
+   * 
+   * @param array $Data
+   * @param type $withLink
+   * @return type object
+   */  
+  public static function TrainingSmallTable($Data,$withLink) {
+        $summary =  translateFN('Training result'); // per: '.$labelsDesc;
+         $thead_data = array(
+              translateFN('Training'),
+              translateFN('Training provider'),
+              translateFN('Duration (hours)'),
+              translateFN('Type')
+          );
+        $tbody_dataAr = array();
+
+        foreach ($Data as $singleData) {
+//            $singleData = (array)$singleObj;
+            if ($withLink) {
+                $href = HTTP_ROOT_DIR.'/modules/jobSearch/search.php?op=tcard&id='.$singleData['idTraining'];
+                $textLink = $singleData['nameTraining'];
+                $linkCard = BaseHtmlLib::link($href, $textLink);
+                $singleData['nameTraining'] =$linkCard; 
+                
+            }
+            $tbody_dataAr[] = array(
+                  $singleData['nameTraining'],
+                  $singleData['company'],
                   $singleData['durationHours'],
                   $singleData['trainingType']
             );
@@ -393,6 +431,21 @@ class searchHtmlLib {
       return $cpi_container;
    }
 
+    public static function jobCardShow($jobDataHtml,$relatedTrainingData, $withLink=false) {
+      $container = CDOMElement::create('div','id:job_card_container');
+      $job_div = CDOMElement::create('div','id:job');
+      $job_div->addChild(new CText($jobDataHtml));
+      $container->addChild($job_div); 
+      $training_div = CDOMElement::create('div','id:training');
+//      var_dump($relatedTrainingData);
+      $relatedTrainingTable = searchHtmlLib::TrainingSmallTable($relatedTrainingData, $withLink);
+      //$data_list = BaseHtmlLib::plainListElement('class:cpi_data', $CPIData, FALSE);
+      $training_div->addChild($relatedTrainingTable); 
+    
+      $container->addChild($training_div); 
+      return $container;
+   }
+   
     
     
 }

@@ -12,7 +12,7 @@ class utility {
      * @return string $istatCode
      * 
      */
-    public static function getIstatCode($words) {
+    public static function getIstatCode($words,$singleCat = true) {
         
         $urlSemanticApi = URL_LAVORI4.$words;
         $keywords = $words;
@@ -20,7 +20,12 @@ class utility {
         $curlHeader = '';
         $codeResult = REST_request::sendRequest($keywords,$curlHeader,$urlSemanticApi,$curlPost);
         $codeResult = json_decode($codeResult,TRUE);
-        $istatCode = $codeResult['job_types']['categories'][0]['category'];        
+        if ($singleCat) {
+            $istatCode = $codeResult['job_types']['categories'][0]['category'];        
+        }
+        else {
+            $istatCode = $codeResult['job_types']['categories'];        
+        }
 //        return $jobsCode['job_types']['categories'][0]['category'];
         return $istatCode;
     }

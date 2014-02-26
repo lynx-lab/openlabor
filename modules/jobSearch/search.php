@@ -53,6 +53,15 @@ require_once ROOT_DIR . '/modules/jobSearch/include/Forms/SearchForm.inc.php';
 require_once MODULES_DIR. '/jobSearch/include/searchHtmlLib.inc.php';
 require_once ROOT_DIR.'/include/data_validation.inc.php';
 require_once('include/restRequest.inc.php');
+require_once MODULES_DIR. '/jobSearch/include/jobClasses.inc.php';
+
+
+/**
+ * include of AMA specific for OpenLabor.
+ * it is used by API
+ */
+require_once(ROOT_DIR.'/api/'.API_VERSION.'/include/AMAOpenLaborDataHandler.inc.php');
+
 
 
 /*
@@ -318,12 +327,20 @@ if(isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'GET' && (
                 $curlPost = false;
                 $format = 'json';
                 $urlApi = URL_API_REQUESTS.'.'.$format.'?service_code='.$service_code.'&jobID='.$id;
-//                $urlApi = URL_API . 'jobs/'.$id;
                 $jobResult = REST_request::sendRequest($jsonToSearch,$curlHeader,$urlApi,$curlPost);
                 $jobData = json_decode($jobResult);
+                $jobDataAr = (array)$jobData[0];
+                $positionCode4Char = substr($jobDataAr['positionCode'],0,7);
+                
                 $jobTable = searchHtmlLib::jobCardTable($jobData, $withLink);
-                $data = $jobTable->getHtml();
+                $jobDataHtml = $jobTable->getHtml();
 //                print_r($jobsData);
+                $relatedTrainingData = job::getRelatedTraining($positionCode4Char); //listTrainingFromISTATCode
+//                $relatedTrainingData = job::listTrainingFromISTATCode($positionCode4Char); //listTrainingFromISTATCode
+//                print_r($relatedTraining);
+                $jobCard = searchHtmlLib::jobCardShow($jobDataHtml, $relatedTrainingData, true);
+                $data = $jobCard->getHtml();
+                
             } else {
                 $data = 'scheda';
             }
@@ -411,9 +428,12 @@ if(isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'GET' && (
                 $curlHeader = '';
                 $curlPost = false;
                 $format = 'json';
-                $urlApi = URL_API_REQUESTS.'.'.$format.'?service_code='.$service_code.'&ID='.$id;
+                $urlApi = URL_API_REQUESTS.'.'.$format.'?service_code='.$service_code;
                 $Result = REST_request::sendRequest($jsonToSearch,$curlHeader,$urlApi,$curlPost);
                 $DataObj = json_decode($Result);
+                foreach ($DataObj as $singleObj) {
+                    $singleData = (array)$singleObj;
+                }
                 $DataAll = (array)$DataObj;
                 $Data = (array)$DataAll[0];
                 $lat = $Data['t_latitude'];
