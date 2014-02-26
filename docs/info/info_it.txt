@@ -1,3 +1,25 @@
-<p>
-Informazioni sulla piattaforma ADA 2.0
-</p>
+<p ><strong>OpenLabor</strong> (opendata + labor) è una piattaforma per la ricerca di lavoro e formazione che aggrega rendendo accessibili i dati delle opportunità di lavoro e formazione, sia provenienti da enti pubblici, che dai soggetti privati, che segnalati da utenti, moltiplicandone il valore attraverso i tipici meccanismi dei social networks.<br /><br />
+<strong>OpenLabor</strong> è una <em><strong>piattaforma </strong></em>che permette di:</p>
+<ul><li >collezionare open data sulle opportunità di lavoro</li>
+<li >collezionare open data sulle offerte di formazione pubblica e private</li>
+<li >ripulire i dati, indicizzarli e renderli "semanticamente" comprensibili agli utenti</li>
+<li >proporli a programmatori e aziende tramite API e/o webservices</li>
+<li >offrire alle pubbliche amministrazioni statistiche in tepo reale e report sulle richieste da parte degli utenti</li>
+</ul><p ><strong>OpenLabor</strong> è anche un'<em><strong>applicazione </strong></em>(web e smartphone) che:</p>
+<ul><li >incrocia e filtra i dati sulla base del profilo dell'utente (competenze, interessi, esperienze, biografia, ricerche)</li>
+<li >fa all'utente una serie di proposte mirate, anche attraverso canali informali come Social Neworks permette il miglioramento delle proposte attraverso il feedback degli utenti</li>
+<li >segnala agli utenti la formazione necessaria per colmare il gap di competenze che impedisce all'utente di soddisfare le offerte di lavoro.</li>
+</ul><p ><strong>OpenLabor </strong>è <strong><em>social</em></strong>,<strong> </strong>consente agli utenti di:</p>
+<ul><li >segnalare opportunità di lavoro non presenti in piattaforma</li>
+<li >segnalare opportunità di formazione informali</li>
+<li >segnalare ad utenti amici opportunità di lavoro e di formazione presenti in piattaforma</li>
+<li >segnalare la formazione di cui avrebbero bisogno nella loro area</li>
+<li >votare l'utilità di percorsi di formazione</li>
+<li >confrontare le proprie esperienze dopo i colloqui</li>
+<li >partecipare a gruppi di interesse</li>
+</ul><p ><strong>OpenLabor</strong> <em><strong>statistiche </strong></em>fornisce alla PA dati secondari relativi a:</p>
+<ul><li >lavori più richiesti (per età, per genere, per curriculum, per profilo utente)</li>
+<li >formazione più richiesta (per età, per genere, per curriculum, per profilo utente)</li>
+<li >soddisfazione rispetto alle esperienze formative</li>
+<li >esito dei colloqui di lavoro</li>
+</ul>

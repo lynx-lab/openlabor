@@ -1,0 +1,49 @@
+<h2>
+    <a name="general">OpenLabor API specification</a>
+</h2>
+                
+<h3  class="testh2">General</h3>
+The OpenLabor APIs have being developed inside CitySDK project. They are useful for sending job and training reports and requests to cities services.</br> 
+At the moment, APIs are used for sending reports/requests about job opportunities, but they are planned for being used for vacational training opportunities as well. <br />
+    The following functionalities are provided by the APIs:
+<ul>
+    <li>
+        Listing of service request types and definitions of the additional attributes
+    </li>    
+    <li>
+    Submitting service requests
+    </li>    
+    <li>
+    Quering individual or multiple service requests and their descriptions and status
+    </li>    
+</ul>
+    The issue reporting API is based on GeoReporting version 2, which is better known as <a href="http://open311.org/" target="_blank">Open311 specification</a>.  
+This interface is compliant with <a href="http://www.citysdk.eu/" target="_blank">CitySDK</a> specific enhancements to Open311 API
+<p>
+<div>
+    <h3>API Key</h3>
+    <div>
+Applications willing to submit jobs or training offers or comments will need an API key. All other methods are open (do not require API keys).         
+    </div>
+</div>
+
+<h3>Encoding and formats</h3>
+<p>UTF-8 is required everywhere. API supports both XML and JSON.</p>
+<h3>Language support</h3>
+At the  moment, the only values acceptable for the "locale" variable are en_US and it_IT. See more about multilingual issues in the general information about OpenLabor project. 
+<h2 class="testh2">
+<a name="methods">
+   API methods 
+</a>
+</p>    
+</h2>
+<p>OpenLabor provides RESTFul API methods according to <strong>international&#160;</strong><strong>standard&#160;</strong><strong><a href="http://open311.org/" target="_blank">Open311</a>:</strong></p>
+<ul>
+    <li>Check out the service (discovery):&#160;<a href="http://openlabor.lynxlab.com/api/v1/doc_news/discovery.xml" target="_blank">XML</a>&#160;o&#160;<a href="http://openlabor.lynxlab.com/api/v1/discovery.json" target="_blank">JSON</a></li>
+    <li>Check out the services (services):&#160;<a href="http://openlabor.lynxlab.com/api/v1/doc_news/services.xml" target="_blank">XML</a>&#160;o&#160;<a href="http://openlabor.lynxlab.com/api/v1/services.json" target="_blank">JSON</a></li>
+    <li>Check out the details of JOBS search service:&#160;<a href="http://openlabor.lynxlab.com/api/v1/services/001.xml" target="_blank">XML</a>&#160;o&#160;<a href="http://openlabor.lynxlab.com/api/v1/services/001.json" target="_blank">JSON</a></li>
+    <li>Check out the details of the reporting job service:&#160;<a href="http://openlabor.lynxlab.com/api/v1/services/002.xml" target="_blank">XML</a>&#160;o&#160;<a href="http://openlabor.lynxlab.com/api/v1/services/002.json" target="_blank">JSON</a></li>
+    <li>Check out the details of&#160;the training opportunities search service:&#160;<a href="http://openlabor.lynxlab.com/api/v1/services/005.xml" target="_blank">XML</a>&#160;o&#160;<a href="http://openlabor.lynxlab.com/api/v1/services/005.json" target="_blank">JSON</a></li>
+    <li>Check out the details of the reporting training opportinities service:&#160;<a href="http://openlabor.lynxlab.com/api/v1/services/006.xml" target="_blank">XML</a>&#160;o&#160;<a href="http://openlabor.lynxlab.com/api/v1/services/006.json" target="_blank">JSON</a></li>
+</ul>
+

@@ -4,13 +4,13 @@
 Se cerchi lavoro nella Provincia di Roma, sei nel posto giusto!<br /> 
 <img src="docs/news/lav1.png" border="0" width="50px"><img src="docs/news/lav2.png" border="0" width="50px"><img src="docs/news/lav3.png" border="0" width="50px"><br />
 Decidi quale qualifica ti interessa, seleziona l'area geografica e inserisci il tuo titolo di studio. <br/>
-Il motore di <a href="modules/jobSearch/search.php"> ricerca</a> ti aiuta a trovare il lavoro che fa per te. 
+Vai nell'ambiente di<a href="modules/jobSearch/search.php"> ricerca</a> e trovare il lavoro che fa per te. 
 </div>
 <div>
-<img src="http://www.lynxlab.com/sites/default/files/styles/large/public/openlaborsmartphone.png" border="0" width="50px"> Se vuoi : 
+<<img src="http://www.lynxlab.com/sites/default/files/styles/large/public/openlaborsmartphone.png" border="0" width="50px"> Se vuoi  
 <ul><li>utilizzare le funzionalit&agrave; di OpenLabor ovunque, </li>
 <li>ricevere una notifica in tempo reale se si rende disponibile un lavoro, </li>
-<li>segnalare un'offerta ai tuoi amici o contattare il Centro per l'Impiego</li>
+<li>segnalare un'offerta ai tuoi amici o contattare il Centro per l'Impiego,</li>
 </ul>
  scarica l'App <a href="http://www.lynxlab.com/it/openlabor-android-app.html" target='_blank'>OpenLabor Roma</a> per Android <br /> 
 <p><a href="http://www.lynxlab.com/it/openlabor-android-app.html" target='_blank'><img src="http://www.lynxlab.com/sites/default/files/styles/medium/public/logo_open_labor.png" border="0" width="100px" alt="openlabor roma"></a></p>

@@ -1,0 +1,25 @@
+<p><strong>OpenLabor </strong>(opendata + labor) is a platform for job and training search that aggregates and make accessible the scattered data in Internet. This data can came from both the public sector, private entities and users: OpenLabor multiply the value of the information through the traditional mechanisms of social networks.<br><br><strong>OpenLabor </strong>is a platform that allows to:</p>
+<ul><li>collect open data on job opportunities</li>
+<li>collect open data on public and private training</li>
+<li>clean up data, index them and make them "semantically" comprehensible for users</li>
+<li>propose data to programmers and companies via webservices and/or API</li>
+<li>offer to public administrations real time statistics and reports on requests from users</li>
+</ul><p><br><strong>OpenLabor </strong>is also an application (web and Smartphones) which:</p>
+<ul><li>crosses and filters the data on the user's profile (skills, interests, experiences, biography, research)</li>
+<li>makes users specific proposals, including through informal channels such as Social Neworks</li>
+<li>allows improvement through user feedback</li>
+<li>shows users necessary training to bridge the skills gap between job offers.</li>
+</ul><p><br><strong>OpenLabor </strong>as social network, enables users to:</p>
+<ul><li>report job opportunities not present in platform</li>
+<li>report informal learning opportunities</li>
+<li>report job opportunities and training to&nbsp; friends users in the platform</li>
+<li>report training they would need in their area</li>
+<li>vote the usefulness of training paths</li>
+<li>compare their experiences after the talks</li>
+<li>join interest groups</li>
+</ul><p><br><strong>OpenLabor </strong>provide PA statistics on secondary data about:</p>
+<ul><li>most popular job (by age, by gender, for curriculum, for user profile)</li>
+<li>most required training (by age, by gender, for curriculum, for user profile)</li>
+<li>training experience satisfaction</li>
+<li>outcome of job interviews</li>
+</ul>
