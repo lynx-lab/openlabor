@@ -438,6 +438,7 @@ class searchHtmlLib {
       $container->addChild($job_div); 
       $training_div = CDOMElement::create('div','id:training');
 //      var_dump($relatedTrainingData);
+      $training_div->addChild(new CText('<h3>'.translateFN('Related Training courses').'</h3>'));
       $relatedTrainingTable = searchHtmlLib::TrainingSmallTable($relatedTrainingData, $withLink);
       //$data_list = BaseHtmlLib::plainListElement('class:cpi_data', $CPIData, FALSE);
       $training_div->addChild($relatedTrainingTable); 

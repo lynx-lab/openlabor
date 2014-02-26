@@ -33,6 +33,40 @@ function dataTablesExec() {
 	}).show();
 }
 
+function dataTablesTRelatedExec() {
+    var FILE_LANGUAGE = HTTP_ROOT_DIR+"/modules/jobSearch/js/language/language_"+USER_LANGUAGE+".txt";
+//    alert(FILE_LANGUAGE);
+//	$j('#container').css('width', '99%');
+
+	var datatable = $j('#sortableTable').dataTable( {
+//		'sScrollX': '100%',
+                'bLengthChange': false,
+		//'bScrollCollapse': true,
+//		'iDisplayLength': 50,
+                "bFilter": true,
+                "bInfo": false,
+                "bSort": true,
+                "bAutoWidth": true,
+//		'bProcessing': true,
+		'bDeferRender': true,
+                "oLanguage": {
+                    "sUrl": FILE_LANGUAGE
+                },
+//                  "oLanguage": {
+//                    "sSearch": "Filtra: "
+//                  },
+                'aoColumns': [
+                  null,
+                  null,
+                  { 'sType': "numeric" },
+                  null
+                   ],
+                'bPaginate': false
+//		'sPaginationType': 'full_numbers'
+	}).show();
+}
+
+
 function dataTablesExecBIS() {
     var FILE_LANGUAGE = HTTP_ROOT_DIR+"/modules/jobSearch/js/language/language_"+USER_LANGUAGE+".txt";
 //	$j('#container').css('width', '99%');

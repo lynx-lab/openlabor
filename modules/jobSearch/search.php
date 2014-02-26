@@ -203,20 +203,6 @@ if(isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'GET' && (
 
     //require_once("./include/tag_cloud.inc.php");
     
-    /*
-     * needed to sort the tables
-     */
-    $layout_dataAr['JS_filename'] = array(
-                    JQUERY,
-                    JQUERY_DATATABLE,
-                    JQUERY_DATATABLE_DATE,
-                    JQUERY_NO_CONFLICT
-            );
-    $layout_dataAr['CSS_filename']= array(
-                    JQUERY_DATATABLE_CSS
-            );
-    
-
     $summary =  translateFN('Risultati della ricerca'); // per: '.$labelsDesc;
     $min = 0;
     $max = 100;
@@ -340,11 +326,16 @@ if(isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'GET' && (
 //                print_r($relatedTraining);
                 $jobCard = searchHtmlLib::jobCardShow($jobDataHtml, $relatedTrainingData, true);
                 $data = $jobCard->getHtml();
-                
+                    $options['onload_func'] = 'dataTablesTRelatedExec()';
+
             } else {
                 $data = 'scheda';
             }
             $help = ucfirst(translateFN('offer details')); 
+            $back_link = CDOMElement::create('a', 'href:'.$last_visited_node);
+            $back_link->addChild(new CText(translateFN('Torna')));            
+            $back='<a href="javascript: history.go(-1)">'.translateFN('Back to the list').'</a>';
+            $help .= ' '. $back;            
             break;
         case 'tcard':
             $service_code = SEARCH_TRAINING;
@@ -395,6 +386,8 @@ if(isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'GET' && (
                 unset($Data['t_locale']);
                 unset($Data['t_dateInsert']);
                 unset($Data['t_expiration']);
+                unset($Data['t_expiration']);
+                unset($Data['trainingCode']);
                 
                 $DataHtml = searchHtmlLib::trainingShow($Data);
                 $data = $DataHtml->getHtml(); 
@@ -406,6 +399,10 @@ if(isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'GET' && (
                 $data = 'scheda';
             }
             $help = ucfirst(translateFN('training details')); 
+            $back_link = CDOMElement::create('a', 'href:'.$last_visited_node);
+            $back_link->addChild(new CText(translateFN('Torna')));            
+            $back='<a href="javascript: history.go(-1)">'.translateFN('Back to the list').'</a>';
+            $help .= ' '. $back;            
             break;            
         case 'tMap':
             $service_code = SEARCH_TRAINING;
@@ -470,6 +467,10 @@ if(isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'GET' && (
                 $data = 'scheda';
             }
             $help = ucfirst(translateFN('training details')); 
+            $back_link = CDOMElement::create('a', 'href:'.$last_visited_node);
+            $back_link->addChild(new CText(translateFN('Torna')));            
+            $back='<a href="javascript: history.go(-1)">'.translateFN('Back to the list').'</a>';
+            $help .= ' '. $back;            
             break;            
             
         case 'cpi':
@@ -528,6 +529,21 @@ if(isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'GET' && (
  */
 
 $breadcrumbs = translateFN('Ricerca di lavoro e formazione');
+    /*
+     * needed to sort the tables
+     */
+    $layout_dataAr['JS_filename'] = array(
+                    JQUERY,
+                    JQUERY_DATATABLE,
+                    JQUERY_DATATABLE_DATE,
+                    JQUERY_NO_CONFLICT,
+                    MODULES_DIR.'/jobSearch/js/leaflet/leaflet.js',
+                    MODULES_DIR.'/jobSearch/js/leaflet_map.js'
+            );
+    $layout_dataAr['CSS_filename']= array(
+                    JQUERY_DATATABLE_CSS,
+                    MODULES_DIR.'/jobSearch/js/leaflet/leaflet.css'
+        );
 
 /*
  * Output
