@@ -190,6 +190,7 @@ a:visited {text-decoration: none; }
     padding: 10px;
     margin-bottom: 5px;
     background-color: #EFEDED;
+    font-weight: bold;
 }
 /*
  * Navigation panel
