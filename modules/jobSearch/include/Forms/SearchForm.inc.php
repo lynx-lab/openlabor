@@ -16,9 +16,11 @@ require_once ROOT_DIR.'/include/Forms/lib/classes/FForm.inc.php';
 class SearchForm extends FForm {
     public function  __construct() {
         parent::__construct();
-
+        
+        $action = HTTP_ROOT_DIR.'/modules/jobSearch/search.php';
         $this->addTextInput('keywords', translateFN('Qualifica/Corso'));
         $this->setMethod('GET');
+        $this->setAction($action);
 
 /*             ->setRequired()
              ->setValidator(FormValidator::NOT_EMPTY_STRING_VALIDATOR);
@@ -26,7 +28,15 @@ class SearchForm extends FForm {
  */
         $this->addTextInput('city', translateFN('Comune'));
 
-        $this->addTextInput('qualification', translateFN('Titolo di studio richiesto'));
+//        $this->addTextInput('qualification', translateFN('Titolo di studio richiesto'));
+        
+        $qualification = array(
+            'media'=>translateFN('licenza media'),
+            'laurea'=>translateFN('Laurea'),
+            'diploma'=>translateFN('diploma scuola superiore'), 
+            ''=>translateFN('Scegli il titolo di studio')
+            );
+        $this->addSelect('qualification',translateFN('Titolo di studio richiesto'),$qualification);
         
         $lookFor = array('jobs'=>translateFN('lavoro'),'training'=>translateFN('formazione'));
         $this->addSelect('op',translateFN('cerco'),$lookFor,'jobs')

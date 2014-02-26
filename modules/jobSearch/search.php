@@ -182,7 +182,7 @@ if(isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'GET' && (
              */
         }
         if ($toSearch['qualificationRequired'] != '') {
-            $urlApi .= '&qualificationRequired='.urlencode($toSearch['qualificationRequired']);
+            $urlApi .= '&qualification='.urlencode($toSearch['qualificationRequired']);
             /*
             if ($toSearch['keywords'] != '' && $toSearch['city'] != '') {
                 $more = '&';
