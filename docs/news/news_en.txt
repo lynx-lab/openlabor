@@ -18,17 +18,3 @@ The<a href="modules/jobSearch/search.php"> search engine</a> will help you to fi
 </div>
  <div class=”clearer”> </div>
 </div>
-<h4>Have a good search !</h4>
-<hr />
-<p><strong>Note:</strong><br />
- OpenLabor is a still in development application brought to you by  <a href="http://www.lynxlab.com" target="_blank">Lynx</a> with the cofinancing of  European Program <a href='http://ec.europa.eu/information_society/activities/ict_psp/about/index_en.htm' target='_blank'>CIP ICT/PSP</a> in two connected projects in the field of  Smart Cities:<br> 
-<ul>
-<li><a href='http://commonsforeurope.net/' target='_blank'>Commons4EU</a> for the web application</li>
-<li><a href='http://www.citysdk.eu/' target='_blank'>CitySDK</a> for the public API</li>
-</ul>
-<p>
-We use public data  provided by  <a href='http://opendata.provincia.roma.it/'> opendata portal</a> of Province of Roma, who is partner in the two projects.<br />
-<p>OpenLabor is an opensource software released under <a href="http://www.gnu.org/licenses/gpl.html" target="_blank">GPL v.3</a> license.</p>
-<p>&#160;</p>
-</p>
-

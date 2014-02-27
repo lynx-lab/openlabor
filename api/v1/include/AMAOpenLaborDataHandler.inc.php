@@ -837,6 +837,12 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
         $res =  $this->getAllPrepared($sql, $values, AMA_FETCH_ASSOC);    
         return $res;
     }
+
+    public function getAllCPI() {
+        $sql = 'SELECT * FROM `OL_CPI` where 1'; 
+        $res =  $this->getAllPrepared($sql, null, AMA_FETCH_ASSOC);    
+        return $res;
+    }    
     
     public function addCPI($CPIsData) {
         

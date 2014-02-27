@@ -80,9 +80,13 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'POST') {
                     unset ($_SESSION['subscription_page']);
                     header('Location:' . $redirectURL);
                     exit();
-                } else {
+                } elseif ($navigationHistoryObj->lastModule() != HTTP_ROOT_DIR.'/index.php')  {
                     $lastModule = $navigationHistoryObj->lastModule();
                     header('Location:' . $lastModule);
+                    exit();
+                } else {
+                    $redirectURL = $userObj->getHomePage();
+                    header('Location:' . $redirectURL);
                     exit();
                 }
             }

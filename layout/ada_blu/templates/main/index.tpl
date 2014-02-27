@@ -38,10 +38,10 @@
                     </div>    
                 </div>
                 <div class="column">
-                  <div class="lynxRSS portlet">
-                    <div class="portlet-header">RSS Feeds</div>
-                    <div class="portlet-content">
-                        <template_field class="template_field" name="lynxRSS">lynxRSS</template_field>
+                  <div class="CPIMap portlet">
+                    <div class="portlet-header"><i18n>CPI Map</i18n></div>
+                    <div id='map' class="portlet-content">
+                        <template_field class="template_field" name="CPIMap">CPIMap</template_field>
                     </div>
                   </div>
                 </div>
@@ -49,9 +49,9 @@
             <div class="dx">
                 <div class="column">
                 <div class="login portlet">
-                    <div class="portlet-header"><i18n>login</i18n></div>
+                    <div class="portlet-header"><i18n>cerca</i18n></div>
                     <div class="portlet-content">
-                        <template_field class="template_field" name="form">form</template_field>
+                        <template_field class="template_field" name="cerca">cerca</template_field>
                     </div>
     		</div>
                 </div>    
@@ -67,9 +67,9 @@
 
                 <div class="helpcont column">
                     <div class="portlet">
-                        <div class="portlet-header"><i18n>facebook</i18n></div>
+                        <div class="portlet-header"><i18n>CitySDK News</i18n></div>
                         <div class="portlet-content">
-                            <template_field class="template_field" name="fbRSS">fbRSS</template_field>       
+                            <template_field class="template_field" name="citySDKRSS">citySDKRSS</template_field>       
                         </div>
                     </div>    
                 </div>
@@ -106,8 +106,8 @@
 <ul id="menu">
     
 		<li id="tools" class="unselectedtools">
-				<a href="info.php">
-           			 <i18n>informazioni</i18n>
+				<a href="login_required.php">
+           			 <i18n>login</i18n>
 			        </a>
 	 </li>
 	  <li id="search">

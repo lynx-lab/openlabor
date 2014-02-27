@@ -71,6 +71,9 @@ html,body {
 	color: #aeaeae;
 }
 
+#map {
+    height: 35em;
+}
 .portlet {
     border: 1px dotted beige;
     background: #eaeaea;

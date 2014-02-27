@@ -65,6 +65,11 @@ $self = whoami(); // index
 include_once 'include/'.$self.'_functions.inc.php';
 
 
+/*
+ * include config from module jobSearch
+ */
+require_once ROOT_DIR . '/modules/jobSearch/include/config.inc.php';
+require_once ROOT_DIR . '/modules/jobSearch/include/restRequest.inc.php';
 
 // non serve più...
 // require_once ROOT_DIR.'/include/aut/login.inc.php';
@@ -350,9 +355,42 @@ if (isset($testerName))
 	}
 }  else $bottomnewscontent = '';
 
+/*
+ * Create the search form
+ * moved in widget system
+    $helpSearch = translateFN('Imposta i parametri per la ricerca'); 
+    $searchForm = new SearchForm();
+    $dataSearch = $searchForm->getHtml();
+ */
+    
 
+    /*
+ * Create map of CPI
+ */    
+   $service_code = CPI_LIST;
+   $format = 'json';
+   $urlApi = URL_API_REQUESTS.'.'.$format.'?service_code='.$service_code;
+   $CPIResults = REST_request::sendRequest($jsonToSearch,$curlHeader,$urlApi,$curlPost);
+   $CPIData = json_decode($CPIResults);
+   $CPIDataMap = array();
+   foreach ($CPIData as $singleObjCPI) {
+       $singleCPI = (array)$singleObjCPI;
+       if ($singleCPI['latitude'] != null) {
+           unset($singleCPI['idCPI']);
+           unset($singleCPI['CPICod']);
+           unset($singleCPI['fax']);
+           unset($singleCPI['source']);
+           unset($singleCPI['CPIzone']);
+           array_push($CPIDataMap, $singleCPI);
+       }
+    }
+    $CPIDataMapJson = json_encode($CPIDataMap);
+    $_SESSION['CPIDataMapJson'] = $CPIDataMap;
+//    print_r($CPIDataMapJson);
+            
 $content_dataAr = array(
-	'form' => $login->getHtml().$forget_link,
+	'form' => $dataSearch,
+	//'form' => $login->getHtml().$forget_link,
 	'newsmsg' => $newsmsg,
 	'helpmsg' => $hlpmsg,
     'infomsg' => $infomsg,
@@ -383,7 +421,9 @@ $content_dataAr = array(
 				JQUERY,
 				JQUERY_UI,
 				JQUERY_NO_CONFLICT,
-				ROOT_DIR . "/js/main/index.js"
+				ROOT_DIR . "/js/main/index.js",
+                                MODULES_DIR.'/jobSearch/js/leaflet/leaflet.js',
+                                MODULES_DIR.'/jobSearch/js/leaflet_map.js'
 		);
 /**
  * @author giorgio 
@@ -391,10 +431,10 @@ $content_dataAr = array(
  */		
 		$layout_dataAr['CSS_filename'] = array (
 				JQUERY_UI_CSS,
-				JQUERY_UNIFORM_CSS
+				JQUERY_UNIFORM_CSS,
+                                MODULES_DIR.'/jobSearch/js/leaflet/leaflet.css'
 		);
-			
-		$optionsAr['onload_func'] = 'initDoc();';
+//$optionsAr['onload_func'] = "initDoc($CPIDataMapJson );";
+$optionsAr['onload_func'] = 'initDoc();';
 		
 ARE::render($layout_dataAr, $content_dataAr, NULL, (isset($optionsAr) ? $optionsAr : NULL) );
-?>

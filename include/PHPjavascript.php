@@ -88,6 +88,13 @@ var USER_LANGUAGE = '<?php echo $_SESSION['sess_user_language'];?>';
 <?php else: ?>
 var USER_LANGUAGE = null;
 <?php endif; ?>
+<?php if (!empty($_SESSION['CPIDataMapJson'])) : ?>
+var PLANEJSON = <?php echo json_encode($_SESSION['CPIDataMapJson']); ?>
+<?php else: ?>
+var PLANEJSON = null; 
+<?php endif; 
+unset($_SESSION['CPIDataMapJson']);
+?>    
 
 //media type
 var MEDIA_IMAGE = '<?php echo _IMAGE;?>';

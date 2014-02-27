@@ -840,6 +840,43 @@ class RequestsController extends openLaborController {
         return $dataAr;
 
     }     
+    /**
+     * CPI Area
+     */
+    
+    /**
+     * 
+     * CPI search
+     * @param type $request
+     * @eturn $jobResult
+     */
+    public function get020Action($request,$format='xml',$url_parameters) {
+        require_once(__DIR__ .'/../include/config.inc.php');
+        if (!isset($request['CPI_ID'])|| $request['CPI_ID'] == null) {
+            if (isset($request['$dataProvider']) || $request['$dataProvider'] != null) {
+                $dataProvider = $request['$dataProvider'];
+            } 
+            else {
+                $dataProvider = DATA_PROVIDER;
+            }
+            $GLOBALS['dh'] = AMAOpenLaborDataHandler::instance(MultiPort::getDSN($dataProvider));
+            $dh = $GLOBALS['dh'];
+            $listCPI = $dh->getAllCPI();
+        }
+
+        /*
+         * view result in correct format
+         */
+        if ($format == 'xml') {
+            $Result = openLaborController::array2xml($listCPI,'CPI');
+            $Result= str_replace('&', '&amp;',$Result);
+            header ("Content-type: text/xml");
+        } else {
+            header('Content-Type: application/json; charset=utf8');
+            $Result = json_encode($listCPI);
+        }
+        echo $Result;
+    }
     
 
 }
