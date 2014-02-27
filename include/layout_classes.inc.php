@@ -24,6 +24,10 @@ class Layout {
     var $error_msg;
     var $full;
 	var $external_module = false;
+	// @author giorgio 25/set/2013
+	// widgets configuration file name and dir
+	var $WIDGET_filename;
+	var $WIDGET_dir;
 
     //constructor
     function Layout($user_type,$node_type,$family="",$node_author_id="",$node_course_id="",$module_dir="") {
@@ -69,6 +73,11 @@ class Layout {
 	$this->JS_filename = $JSObj->JS_filename;
 	$this->JS_dir = $JSObj->JS_dir;
 	//$this->debug();
+	
+	// Widgets
+	$pageWidgetObj = new PageWidget($this->template);
+	$this->WIDGET_dir = $pageWidgetObj->pageWidgetsDir;
+	$this->WIDGET_filename = $pageWidgetObj->pageWidgets;
 
     }//end function Layout
 
@@ -142,6 +151,12 @@ class Template {
 
         $tpl_fileextension =  $GLOBALS['tpl_fileextension'];
 
+        /**
+         * giorgio 12/ago/2013
+         * sets user select provider
+         */
+        if (!MULTIPROVIDER) $user_provider = $GLOBALS['user_provider'];
+
         // templates file extensions could be .tpl or .dwt or .HTML etc
         // default: .tpl
         if (!isset($tpl_fileextension)) {
@@ -173,11 +188,45 @@ class Template {
 
 	if ($is_external_module) {
 		$tpl_dir = $root_dir."/$module_dir/layout/$family/templates/";
+		$tpl_filename = $tpl_dir.$node_type.$tpl_fileextension;
 	}
 	else {
-		$tpl_dir = $root_dir."/layout/$family/templates/$module_dir/";
+		/**
+		 * giorgio 11/ago/2013
+		 * if it's not multiprovider, let's firstly check for a template
+		 * in the clients/provider dir with only one possibility in $module_dir
+		 */
+		if (!MULTIPROVIDER)
+		{
+			if (stristr($module_dir,$user_provider)) $module_dir='main';
+			$tpl_dir = $root_dir."/clients/".$user_provider."/layout/$family/templates/$module_dir/";
+			$tpl_filename = $tpl_dir.$node_type.$tpl_fileextension;
+			/**
+			 * giorgio 12/ago/2013
+			 *
+			 * checking for default template in user selected provider may not be
+			 * a good idea because it's not known where and when ada shall use this
+			 * template, and it's unpleasant that all of a sudden the user finds
+			 * him/her self in the provider template while he/she is browsing....
+			 *
+			 *  Should you disable it, check carefully all 'anonymous' pages
+			 *  at least info.php should use the default template
+			 */
+			if (!file_exists($tpl_filename))
+			{
+				$tpl_filename = $tpl_dir."default".$tpl_fileextension;
+			}
+		}
 	}
-        $tpl_filename = $tpl_dir.$node_type.$tpl_fileextension;
+	/**
+	 * giorgio 11/ago/2013
+	 * if $tpl_filename is not found inside client dir, resume normal operation
+	 */
+	if (!file_exists($tpl_filename))
+	{
+		$tpl_dir = $root_dir."/layout/$family/templates/$module_dir/";
+		$tpl_filename = $tpl_dir.$node_type.$tpl_fileextension;
+	}
 
         // es. layout/clear/templates/browsing/default/view.tpl
         if (!file_exists($tpl_filename)) {
@@ -194,7 +243,6 @@ class Template {
                 //mydebug(__LINE__,__FILE__, "  $tpl_filename...<br>");
             }
         }
-
         $this->template = $tpl_filename;
         $this->template_dir = $tpl_dir;
         $this->family = $family;
@@ -213,6 +261,13 @@ class CSS {
 
         $root_dir = $GLOBALS['root_dir'];
         $http_root_dir = $GLOBALS['http_root_dir'];
+
+        /**
+         * giorgio 12/ago/2013
+         * sets user select provider
+         */
+        if (!MULTIPROVIDER) $user_provider = $GLOBALS['user_provider'];
+
         $CSS_files = array();
         // reads CSS from filesystem
         //  la struttura dei CSS ricopia quella di ADA (default)
@@ -230,23 +285,61 @@ class CSS {
         }
 
 	if ($is_external_module) {
-		$CSS_dir = $rel_pref.$module_dir."/layout/$family/css/";
+		$CSS_module_dir = $rel_pref.$module_dir."/layout/$family/css/";
+		// as an extreme fallback, use css/main
+		$CSS_dir = $rel_pref."layout/$family/css/main/";
 	}
 	else {
+		/**
+		 * giorgio 11/ago/2013
+		 * module_dir comes as 'clients/PROVIDERNAME'
+		 * let's put it back in place
+		 */
+		if (!MULTIPROVIDER && stristr ($module_dir,$user_provider))
+		{
+			$module_dir = 'main';
+		}
+
 		$CSS_dir = $rel_pref."layout/$family/css/$module_dir/";
 	}
 
-        $CSS_files[] = $CSS_dir."default.css"; //adding default file
-        $CSS_files[] = $CSS_dir.$node_type.".css"; //adding specific node type file
+
+		if (is_file($CSS_module_dir."default.css"))
+			$CSS_files[] = $CSS_module_dir."default.css";
+        else
+        	$CSS_files[] = $CSS_dir."default.css"; //adding default file
+
+        if (is_file($CSS_module_dir.$node_type.".css"))
+        	$CSS_files[] = $CSS_module_dir.$node_type.".css";
+        else if (!in_array($CSS_dir.$node_type.".css",$CSS_files))
+        	$CSS_files[] = $CSS_dir.$node_type.".css"; //adding specific node type file
+
         if (!empty($node_author_id)) {
             if (!empty($node_course_id)) {
                 $CSS_files[] = $http_root_dir."/courses/media/$node_author_id/css/$node_course_id.css";
             }
         }
 
+        /**
+         * giorgio 11/ago/2013
+         * if it's not multiprovider add node_type css and default css
+         * (same structure as in 'main' css sudir)
+         */
+        if (!MULTIPROVIDER)
+        {
+        	$CSS_provider_dir = $rel_pref."clients/".$user_provider."/layout/$family/css/$module_dir/"; 
+        	
+        	if (is_file($CSS_provider_dir."default.css"))
+        		$CSS_files[] = $CSS_provider_dir."default.css";
+
+        	if (is_file($CSS_provider_dir.$node_type.".css"))
+        		$CSS_files[] = $CSS_provider_dir.$node_type.".css";
+        }
+
         $this->CSS_filename = implode(';',$CSS_files);
         $this->CSS_dir = $CSS_dir;
         $this->family = $family;
+
         //  mydebug(__LINE__,__FILE__,"CSS DDS: $duplicate_dir_structure fgroup:$function_group mdir:$module_dir bdir:$basedir_ada". $this->CSS_filename."<br>");
 
     } //end function CSS
@@ -283,7 +376,7 @@ class JS {
         $JS_files[]= $rel_pref."external/lib/js/prototype-1.6.0.1.js";
         $JS_files[]= $rel_pref."external/lib/js/scriptaculous/scriptaculous.js";
         $JS_files[]= $JS_dir."default.js";
-        $JS_files[]= $JS_dir.$node_type.".js";
+        if (!in_array($JS_dir.$node_type.".js",$JS_files)) $JS_files[]= $JS_dir.$node_type.".js";
         if (!empty($node_author_id)) {
             if (!empty($node_course_id)) {
                 $JS_author_file = $rel_pref."courses/media/$node_author_id/js/$node_course_id.js";
@@ -295,5 +388,88 @@ class JS {
         $this->JS_filename = implode(';',$JS_files);
         $this->JS_dir = $JS_dir;
     } //end function JS
+}
+
+
+/**
+ * class for setting the needed XML for the page widget, if any.
+ *
+ * @author giorgio 25/set/2013
+ */
+class PageWidget
+{
+	/**
+	 * holds widgets configuration file full pathname or null on error
+	 * @var string
+	 */
+	var $pageWidgets;
+	
+	/**
+	 * holds widgets configuration file full dirname or null on error
+	 * @var string
+	 */	
+	var $pageWidgetsDir;
+	
+	/**
+	 * hold error string if any
+	 * @var string
+	 */
+	var $error;
+	
+	/**
+	 * default widget configuration file extension
+	 * @var string
+	 */
+	private static $widgetConfFileExtension = '.xml';
+	
+	/**
+	 * where to start looking for dirname.
+	 * e.g. assuming template is in ROOT_DIR .'layout/ada_blu/templates/main/default.tpl'
+	 * it'll extract the dir starting AND NOT INCLUDING the value of the variable.
+	 * e.g. 'main/'
+	 * 
+	 * @var string
+	 */	
+	private static $extractPathStartingFrom = 'templates/';
+	
+    /**
+     * PageWidget constructor, the XML filename is the same as the template, but with xml
+     * extension. If one with same name is found inside the currently active provider, that
+     * one is preferred over the standard one.
+     * 
+     * @param string $filename template file name used to build widget xml file name
+     */
+    public function __construct($filename)
+    {    	
+    	$this->pageWidgets = null;
+    	$this->pageWidgetsDir = null;
+    	$this->error = '';
+    	
+    	$extractStringFrom = strpos($filename, self::$extractPathStartingFrom) + strlen (self::$extractPathStartingFrom);
+    	$extractLength  = strrpos($filename, '/') - $extractStringFrom + 1 ; 
+    	
+    	$dirname = substr ($filename, $extractStringFrom, $extractLength);
+    	$filename = preg_replace('/\..*$/', self::$widgetConfFileExtension, basename($filename));
+
+    	$widgets_filename = '';
+    	
+    	if (!MULTIPROVIDER)
+    	{
+    		$widgets_dir = ROOT_DIR."/clients/".$GLOBALS['user_provider']."/widgets/$dirname";
+    		$widgets_filename = $widgets_dir.$filename;
+    	}
+    	
+    	if (!file_exists($widgets_filename))
+    	{
+    		$widgets_dir = ROOT_DIR . "/widgets/$dirname";
+    		$widgets_filename = $widgets_dir.$filename;
+    		if (!file_exists($widgets_filename)) {
+    			$widgets_dir = $widgets_filename = null;
+    			$this->error = "$widgets_filename not found";    		
+    		}
+    	}    	
+    	$this->pageWidgets = $widgets_filename;
+    	$this->pageWidgetsDir = $widgets_dir;    	
+    }
 }
 ?>
