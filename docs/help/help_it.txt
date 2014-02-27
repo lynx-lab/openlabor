@@ -1,5 +1,11 @@
-<!--
+<h4>Buona ricerca !</h4>
+<hr />
+<p><strong>Nota:</strong><br />
+ OpenLabor &egrave; un'applicazione in via di sviluppo, realizzata da <a href="http://www.lynxlab.com" target="_blank">Lynx</a> con il contributo del Programma Europeo <a href='http://ec.europa.eu/information_society/activities/ict_psp/about/index_en.htm' target='_blank'>CIP ICT/PSP</a> in due progetti connessi tra loro e legati alla tematica delle Smart Cities:<br> 
+<ul>
+<li><a href='http://commonsforeurope.net/' target='_blank'>Commons4EU</a> per l'applicazione web</li>
+<li><a href='http://www.citysdk.eu/' target='_blank'>CitySDK</a> per le API pubbliche</li>
+</ul>
 <p>
-Se hai bisogno di aiuto, consulta l'<a href="http://openlabor.lynxlab.com/help.php">Help</a>
-</p>
--->
+I dati utilizzati per la ricerca provengono dal  <a href='http://opendata.provincia.roma.it/'>portale opendata</a> della Provincia di Roma, che &egrave; partner dei progetti stessi.</p>
+<p>OpenLabor &egrave; una piattaforma opensource rilasciata con licenza <a href="http://www.gnu.org/licenses/gpl.html" target="_blank">GPL v.3</a>.</p>
