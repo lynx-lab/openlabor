@@ -19,7 +19,7 @@
     define('URL_API_REQUESTS',URL_API.'requests');
 
     /*
-     * SERVICE CODE API OPEN 311
+     * SERVICE CODE API CitySDK - OPEN 311
      */
     define('SEARCH_JOBS','001');
     define('JOB_REPORT','002');
@@ -29,6 +29,7 @@
     define('TRAINING_REPORT','006');
     define('TRAINING_COMMENT','007');
     define('TRAINING_VOTE','008');
+    define('CPI_LIST','020');
     
     /*
      * LOG
