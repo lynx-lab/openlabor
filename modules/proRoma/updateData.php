@@ -77,8 +77,9 @@ switch ($typeData) {
            for ($index = 0; $index < count($TrainingData) -1; $index++) {
                $singleTraining = $TrainingData[$index];
                $singleTraining['nameTraining'] = DataValidator::validate_string($singleTraining['nameTraining']);
-               $codeExisting = array_search($singleTraining['nameTraining'], $nameTrainingAlreadyCoded);
-               if ($singleTraining['nameTraining'] != false && $singleTraining['nameTraining'] != '' && !$codeExisting)  {
+               $codeExisting = array_key_exists($singleTraining['nameTraining'], $nameTrainingAlreadyCoded);
+               
+               if ($singleTraining['nameTraining'] != false && $singleTraining['nameTraining'] != '' && $codeExisting !== true)  {
                    $logMsg = $index . ') getIstatCode for: ' . $singleTraining['nameTraining'];
                    utility::LogUpdate($logMsg);   
                    $timeStartIstatCode = time();
@@ -91,23 +92,27 @@ switch ($typeData) {
                    $ISTATCodes = utility::getIstatCode($nameToSearch,$getSingleCode);
                    $singleTrainingCodeAr = array();
                    foreach ($ISTATCodes as $ISTATCode) {
-                       array_push($singleTrainingCodeAr, $ISTATCode['category']);
+                       array_push($singleTrainingCodeAr, array($ISTATCode['category'],$ISTATCode['probability']));
+//                       array_push($singleTrainingCodeAr, array($ISTATCode['category'],number_format($ISTATCode['probability'], 5)));
                    }
                    $singleTraining['trainingCode'] = $singleTrainingCodeAr;
+//                   print_r($singleTraining);die();
                    /*
                     * 
                     */
-                   sleep (2);
+//                   sleep (2);
                    $timeElapsed = time() - $timeStartIstatCode;
-                   $logMsg ='getIstatCode for: ' . $singleTraining['nameTraining']. ' return '. $singleTraining['trainingCode'] . ' Time elapsed: ' . $timeElapsed; 
+                   $logMsg ='getIstatCode for: ' . $singleTraining['nameTraining']. ' return '. count($singleTraining['trainingCode']) . ' code(s) Time elapsed: ' . $timeElapsed; 
                    utility::LogUpdate($logMsg);   
                    $TrainingData[$index]['trainingCode'] = $singleTraining['trainingCode'];
-                   $nameTrainingAlreadyCoded[$singleTraining['trainingCode']] = $singleTraining['nameTraining'];
+                   $nameTrainingAlreadyCoded[$singleTraining['nameTraining']] = $singleTraining['trainingCode'];
 
                }else {
-                  $logMsg = 'getIstatCode: ' . $singleTraining['nameTraining'] . ' Already existing. Code: '. $codeExisting;
+                  $alreadyCodedAr =  $nameTrainingAlreadyCoded[$singleTraining['nameTraining']];
+                  $logMsg = 'getIstatCode: ' . $singleTraining['nameTraining'] . ' Already existing. Code(s): '. count($alreadyCodedAr);
                   utility::LogUpdate($logMsg);   
-                  $singleTraining['trainingCode'] = $codeExisting;
+                  $TrainingData[$index]['trainingCode'] = $alreadyCodedAr;
+//                  $singleTraining['trainingCode'] = $codeExisting;
                }
            }
        }

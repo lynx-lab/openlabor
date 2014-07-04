@@ -580,8 +580,9 @@ class RequestsController extends openLaborController {
                 $clause = str_replace('qualificationRequired', 't_qualificationRequired', $clause);
             }
             
-
-            $trainingOffers = $dh->listTrainingOffers($clause);
+            $codeToSearch = array();
+            $orderby='nameTraining'; 
+            $trainingOffers = $dh->listTrainingOffers($clause, $codeToSearch,$orderby);
         }
         return $trainingOffers;
     }

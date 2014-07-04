@@ -5,21 +5,18 @@ function dataTablesExec() {
 
 	var datatable = $j('#sortableTable').dataTable( {
 //		'sScrollX': '100%',
-                'bLengthChange': false,
+                'bLengthChange': true,
 		//'bScrollCollapse': true,
-//		'iDisplayLength': 50,
+		'iDisplayLength': 10,
                 "bFilter": true,
-                "bInfo": false,
+                "bInfo": true,
                 "bSort": true,
                 "bAutoWidth": true,
-//		'bProcessing': true,
+		'bProcessing': true,
 		'bDeferRender': true,
                 "oLanguage": {
                     "sUrl": FILE_LANGUAGE
                 },
-//                  "oLanguage": {
-//                    "sSearch": "Filtra: "
-//                  },
                 'aoColumns': [
                   null,
                   null,
@@ -28,8 +25,8 @@ function dataTablesExec() {
                   null,
                   null
                    ],
-                'bPaginate': false
-//		'sPaginationType': 'full_numbers'
+                'bPaginate': true,
+		'sPaginationType': 'full_numbers'
 	}).show();
 }
 
@@ -41,10 +38,10 @@ function dataTablesTRelatedExec() {
 	var datatable = $j('#sortableTable').dataTable( {
 //		'sScrollX': '100%',
                 'bLengthChange': false,
-		//'bScrollCollapse': true,
-//		'iDisplayLength': 50,
+		'bScrollCollapse': true,
+		'iDisplayLength': 20,
                 "bFilter": true,
-                "bInfo": false,
+                "bInfo": true,
                 "bSort": true,
                 "bAutoWidth": true,
 //		'bProcessing': true,
@@ -52,17 +49,16 @@ function dataTablesTRelatedExec() {
                 "oLanguage": {
                     "sUrl": FILE_LANGUAGE
                 },
-//                  "oLanguage": {
-//                    "sSearch": "Filtra: "
-//                  },
                 'aoColumns': [
                   null,
                   null,
                   { 'sType': "numeric" },
-                  null
+                  null,
+                  { 'sType': "numeric", "bVisible": false}
                    ],
-                'bPaginate': false
-//		'sPaginationType': 'full_numbers'
+                 "aaSorting": [[ 4, "desc" ]],  
+                'bPaginate': true,
+		'sPaginationType': 'full_numbers'
 	}).show();
 }
 

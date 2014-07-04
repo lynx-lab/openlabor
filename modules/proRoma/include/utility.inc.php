@@ -21,12 +21,11 @@ class utility {
         $codeResult = REST_request::sendRequest($keywords,$curlHeader,$urlSemanticApi,$curlPost);
         $codeResult = json_decode($codeResult,TRUE);
         if ($singleCat) {
-            $istatCode = $codeResult['job_types']['categories'][0]['category'];        
+            $istatCode = $codeResult['job_types']['categories'][0]; 
         }
         else {
             $istatCode = $codeResult['job_types']['categories'];        
         }
-//        return $jobsCode['job_types']['categories'][0]['category'];
         return $istatCode;
     }
 

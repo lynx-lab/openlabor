@@ -320,7 +320,17 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
     public function addTrainingOffers ($trainingsData) {
         $db =& $this->getConnection();
         if (self::isError($db)) return $db;
-        $oldTrainings = $this->listTrainingOffers();
+        /*
+         * condition to find all the training offers
+         */
+        $condition = 'where 1';
+        $codeToSearch = array();
+        $orderby='nameTraining';
+        $limit=0; //no limit
+        /*
+         * end condition to find all the training offers
+         */
+        $oldTrainings = $this->listTrainingOffers($condition, $codeToSearch,$orderby, $limit);
         $i=0;
         $o=0;
         foreach ($trainingsData as $oneTrainingData) {
@@ -432,7 +442,9 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
         $db =& $this->getConnection();
         if (self::isError($db)) return $db;
         foreach ($codes as $singleCode) {
-            $sql = "INSERT INTO `OL_TrainingCode` (id_TC_training,ISTATCode) VALUES ($idTraining,'$singleCode')";
+            $istatCode = $singleCode[0];
+            $weight = floatval($singleCode[1]);
+            $sql = "INSERT INTO `OL_TrainingCode` (id_TC_training,ISTATCode,code_weight) VALUES ($idTraining,'$istatCode',$weight)";
             ADALogger::log_db("trying inserting the training Code: ".$sql);
 
             $res = $db->query($sql);
@@ -452,7 +464,7 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
         $db =& $this->getConnection();
         if (self::isError($db)) return $db;
         foreach ($codes as $singleCode) {
-            $sql = "SELECT ISTATCode  FROM `OL_TrainingCode` where id_TC_training = $idTraining";
+            $sql = "SELECT ISTATCode,code_weight  FROM `OL_TrainingCode` where id_TC_training = $idTraining";
             ADALogger::log_db("trying select the training Code: ".$sql);
 
             $res =  $this->getAllPrepared($sql, null, AMA_FETCH_ORDERED);            // if an error is detected, an error is created and reported
@@ -764,7 +776,7 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
      * 
      * @return an error if something goes wrong or an array contains all the offers
      */
-    public function listTrainingOffers($condition='where 1', $codeToSearch = array()) {
+    public function listTrainingOffers($condition='where 1', $codeToSearch = array(),$orderby='code_weight', $limit=0, $howToOrder='ASC') {
         $db =& $this->getConnection();
         if (self::isError($db)) return $db;
         /*
@@ -776,10 +788,33 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
         }
          * 
          */
-        $sql = 'SELECT distinct(T.idTraining), T.* FROM  `OL_training` AS T, OL_TrainingCode AS I' . ' ' .$condition; 
-//        print_r($sql);
+        $condition .= ' AND I.id_TC_training = T.idTraining';
+        $sql = 'SELECT distinct(T.idTraining), T.*, I.ISTATCode, I.code_weight FROM  `OL_training` AS T, OL_TrainingCode AS I' . ' ' .$condition . ' ORDER BY '. 
+                $orderby . ' '. $howToOrder;
+        if ($limit > 0) $sql.= ' LIMIT '. $limit; 
         $res =  $this->getAllPrepared($sql, null, AMA_FETCH_ASSOC);
-        return $res;
+        if (self::isError($res)) {
+            return new AMA_Error("error in reading training",$res);
+        }
+        $resultCompacted = array();
+        $idTraningAlreadyChecked = array();
+        $i = 0;
+        foreach ($res as $singleTraining) {
+            $idToCheck = $singleTraining['idTraining'];
+            $isAlreadyChecked = array_search($idToCheck,$idTraningAlreadyChecked);
+            if ($isAlreadyChecked === FALSE) {
+                if (count($idTraningAlreadyChecked)>0) $i++;
+                $resultCompacted[] = $singleTraining;
+                array_push($idTraningAlreadyChecked, $singleTraining['idTraining']);
+                unset ($resultCompacted[$i]['ISTATCode']);
+                unset ($resultCompacted[$i]['code_weight']);
+                unset ($resultCompacted[$i]['trainingCode']);
+                $resultCompacted[$i]['trainingCode'] = array();
+            }
+            array_push($resultCompacted[$i]['trainingCode'],array($singleTraining['ISTATCode'],$singleTraining['code_weight']));
+        }
+//        print_r($resultCompacted);die();
+        return $resultCompacted;
     }
 
      /**
@@ -791,11 +826,12 @@ class AMAOpenLaborDataHandler extends AMA_DataHandler {
      * 
      * @return an error if something goes wrong or an array contains all the offers
      */
-    public function listTrainingFromISTATCode($code) {
+    public function listTrainingFromISTATCode($code,$orderby='code_weight', $limit=0) {
         $db =& $this->getConnection();
         if (self::isError($db)) return $db;
-        $sql = 'SELECT T . * , C.ISTATCode FROM `OL_training` AS T, OL_TrainingCode AS C WHERE T.idTraining = C.id_TC_training AND C.`ISTATCode` like \''. $code.'%\'';
-//        print_r($sql);
+        $sql = 'SELECT T . * , C.ISTATCode, C.code_weight FROM `OL_training` AS T, OL_TrainingCode AS C WHERE T.idTraining = C.id_TC_training AND C.`ISTATCode` like \''. $code.'%\''
+                    . ' ORDER BY '. $orderby . ' DESC';
+        if ($limit > 0) $sql.= ' LIMIT '. $limit;
         $res =  $this->getAllPrepared($sql, null, AMA_FETCH_ASSOC);
         return $res;
     }

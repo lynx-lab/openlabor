@@ -265,7 +265,8 @@ class searchHtmlLib {
               translateFN('Training'),
               translateFN('Training provider'),
               translateFN('Duration (hours)'),
-              translateFN('Type')
+              translateFN('Type'),
+              translateFN('weight')
           );
         $tbody_dataAr = array();
 
@@ -282,7 +283,8 @@ class searchHtmlLib {
                   $singleData['nameTraining'],
                   $singleData['company'],
                   $singleData['durationHours'],
-                  $singleData['trainingType']
+                  $singleData['trainingType'],
+                  $singleData['code_weight']
             );
 
         }
