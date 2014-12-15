@@ -44,16 +44,31 @@ define('ADA_TRAINING_SERVICE_ID','2');
 define('ADA_TRAINING_INSTANCE_SERVICE_ID','7');
 
 /*
+ * PWD of Semantic API
+ */
+define('PWD_SEMANTIC','api key');
+
+/*
  * URL of Semantic API
  */
-define('URL_LAVORI5','http://openlabor.lynxlab.com/services/search/lavori5/');
-define('URL_LAVORI4','http://openlabor.lynxlab.com/services/search/lavori4/');
+/*
 
+define('URL_BASE_SEMANTIC','http://openlabor.lynxlab.com/services/');
+define('URL_LAVORI5',URL_BASE_SEMANTIC.'search/lavori5/');
+define('URL_LAVORI4',URL_BASE_SEMANTIC.'search/lavori4/');
+ * 
+ */
+
+define('URL_BASE_SEMANTIC','http://serendipity.lynxlab.com:81/services/');
+define('URL_LAVORI5',URL_BASE_SEMANTIC.PWD_SEMANTIC.'/search/lavori5/');
+define('URL_LAVORI4',URL_BASE_SEMANTIC.PWD_SEMANTIC.'/search/lavori4/');
+
+define('MINPROBRATIO','0.01');
 
 /*
  * Number of professional code to treat
  */
-define('NUMBER_CODE',4);
+define('NUMBER_CODE',6);
 
 define('DIR_INFO_SERVICES','doc_news');
 define('DISCOVERY_INFO',DIR_INFO_SERVICES.'/discovery.xml');

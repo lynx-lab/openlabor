@@ -16,7 +16,7 @@
   /**
   *  Root dir relative path
   */
-  define('ROOT_DIR','/var/www/html/ada');
+  define('ROOT_DIR','/var/www/html/openlabor');
 /**
 * Main include file
 */

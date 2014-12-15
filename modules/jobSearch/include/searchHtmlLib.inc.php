@@ -449,7 +449,19 @@ class searchHtmlLib {
       return $container;
    }
    
-    
+   
+   public static function apiResultDiv($urlApi,$resultData) {
+       $result_div = CDOMElement::create('div','id:api_result');
+       $url_div = CDOMElement::create('div','id:api_url');
+       $url_div->addChild($urlApi);
+       $result_div->addChild($url_div);
+       
+       $data_div = CDOMElemet::create('div','id:api_data_result');
+       $pre_data = CDOMElement::create('pre');
+       $data_div->addChild($pre_data);
+       $resutl_div->addChild($dat_div);
+       return $result_div;
+   }      
     
 }
 

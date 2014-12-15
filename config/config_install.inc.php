@@ -20,9 +20,9 @@
  * ADA Common database
  */
 define('ADA_COMMON_DB_TYPE',  'mysql');
-define('ADA_COMMON_DB_NAME',  'ada_common');
-define('ADA_COMMON_DB_USER',  'ada_db_common');
-define('ADA_COMMON_DB_PASS',  'common');
+define('ADA_COMMON_DB_NAME',  'openlabor_common');
+define('ADA_COMMON_DB_USER',  'root');
+define('ADA_COMMON_DB_PASS',  '');
 define('ADA_COMMON_DB_HOST',  'localhost');
 
 /*
@@ -30,9 +30,9 @@ define('ADA_COMMON_DB_HOST',  'localhost');
  */
 define('ADA_PUBLIC_TESTER', 'client0');
 define('ADA_DEFAULT_TESTER_DB_TYPE',  'mysql');
-define('ADA_DEFAULT_TESTER_DB_NAME',  'ada_provider0');
-define('ADA_DEFAULT_TESTER_DB_USER',  'user');
-define('ADA_DEFAULT_TESTER_DB_PASS',  'password');
+define('ADA_DEFAULT_TESTER_DB_NAME',  'openlabor_provider0');
+define('ADA_DEFAULT_TESTER_DB_USER',  'root');
+define('ADA_DEFAULT_TESTER_DB_PASS',  '');
 define('ADA_DEFAULT_TESTER_DB_HOST',  'localhost');
 
 /**
@@ -113,7 +113,7 @@ define('ADA_ADMIN_MAIL_ADDRESS','mail@lynxlab.com');
 /**
  *
  */
-define('PORTAL_NAME','ADA 2.1');
+define('PORTAL_NAME','OpenLabor ');
 
 /**
  * ADA version
@@ -124,7 +124,8 @@ define('ADA_VERSION','2.1alpha0');
  * URL
  * DO NOT REMOVE the trailing // *js_import*
  */
-define('HTTP_ROOT_DIR','http://ada.lynxlab.com'); // *js_import*
+//define('HTTP_ROOT_DIR','http://localhost/openlabor'); // *js_import*
+define('HTTP_ROOT_DIR','http://openlabor.graffio.org'); // *js_import*
 define('MODULES_DIR',ROOT_DIR.'/modules'); // *js_import*
 
 /**

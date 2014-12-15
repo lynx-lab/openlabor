@@ -280,7 +280,8 @@ class RequestsController extends openLaborController {
         $curlHeader = '';
         $jobResult = REST_request::sendRequest($keywords,$curlHeader,$urlSemanticApi,$curlPost);
         $jobResult = json_decode($jobResult,TRUE);
-        $positionCode = $jobResult['job_types']['categories'][0]['category'];        
+//        $positionCode = $jobResult['job_types']['categories'][0]['category'];        
+        $positionCode = $jobResult['categories'][0]['category'];        
 //        return $jobsCode['job_types']['categories'][0]['category'];
         return $positionCode;
     }
@@ -341,7 +342,10 @@ class RequestsController extends openLaborController {
             $foundKeywords = false;
 
             $curlPost = false;
-            $urlSemanticApi = URL_LAVORI4.$toSearch['keywords'];
+            $urlSemanticApi = URL_LAVORI5.$toSearch['keywords'];
+            if (constant('MINPROBRATIO')!=NULL) {
+                $urlSemanticApi.= '?minprobratio='.MINPROBRATIO;
+            }
             $keywords = $toSearch['keywords'];
             //$curlHeader = array("Content-Type: application/x-www-form-urlencoded");
             $curlHeader = '';
@@ -349,7 +353,8 @@ class RequestsController extends openLaborController {
             
             $resultAR = json_decode($jobsCode, TRUE);
             if (count($resultAR) > 0) {
-                $professionalCodes = $resultAR['job_types']['categories'];
+//                $professionalCodes = $resultAR['job_types']['categories'];
+                $professionalCodes = $resultAR['categories'];
                 if (count($professionalCodes) > 0) {
                     $foundKeywords = true;
                     
@@ -365,7 +370,8 @@ class RequestsController extends openLaborController {
                      * @todo find the way to order the results by professional code order in the array $professionalCode
                      */
                     for ($i=0; $i<$numberCode;$i++) {
-                        $professionalCode = $professionalCodes[$i]['category'];
+                        $professionalCode = $professionalCodes[$i]['category']; 
+                        $professionalCode = substr($professionalCode, 0,6); //only the first 6 chars es.: 2.1.0.2
                         switch ($i) {
                             case 0:
                                 $clauseKey = '(positionCode like \''.$professionalCode.'%\'';
@@ -380,6 +386,12 @@ class RequestsController extends openLaborController {
                                 $clauseKey .= ' OR positionCode like \''.$professionalCode.'%\'';
                                 break;
                         }
+                        $seeAlsoAr = $professionalCodes[$i]['see_also'];
+                        foreach ($seeAlsoAr as $singleSeeAlso) {
+                            $seeAlsoCode = $singleSeeAlso['category'];
+                            $clauseKey .= ' OR positionCode like \''.$seeAlsoCode.'%\'';
+                        }
+                        
                     }
                     if ($clauseKey != NULL) {
                         $clause .= ' '. $clauseKey.')';
@@ -530,7 +542,8 @@ class RequestsController extends openLaborController {
             
             $resultAR = json_decode($jobsCode, TRUE);
             if (count($resultAR) > 0) {
-                $professionCodes = $resultAR['job_types']['categories'];
+//                $professionCodes = $resultAR['job_types']['categories'];
+                $professionCodes = $resultAR['categories'];
                 if (count($professionCodes) > 0) {
                     $foundKeywords = true;
                     

@@ -200,7 +200,11 @@ if(isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'GET' && (
      */
     $jobsResults = REST_request::sendRequest($jsonToSearch,$curlHeader,$urlApi,$curlPost);
     $jobsData = json_decode($jobsResults);
-
+    
+    //$apiTextLink = translateFN('Esegui la chiamata alle API utilizzata per la ricerca');
+    $apiTextLink = translateFN('URL dell\'API utilizzata: ').$urlApi;
+    $linkApi = BaseHtmlLib::link($urlApi, $apiTextLink);
+    
     //require_once("./include/tag_cloud.inc.php");
     
     $summary =  translateFN('Risultati della ricerca'); // per: '.$labelsDesc;
@@ -239,6 +243,7 @@ if(isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'GET' && (
             $textLink = translateFN('Cambia i parametri di ricerca');
             $linkNewSearch = BaseHtmlLib::link($href, $textLink);
             $help .= ' - ' . $linkNewSearch->getHtml();
+            $help .= ' - ' . $linkApi->getHtml();
             
         
             break;
@@ -275,7 +280,7 @@ if(isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'GET' && (
             $textLink = translateFN('Cambia i parametri di ricerca');
             $linkNewSearch = BaseHtmlLib::link($href, $textLink);
             $help .= ' - ' . $linkNewSearch->getHtml();
-            
+            $help .= ' - ' . $linkApi->getHtml();
         
             break;
     }
